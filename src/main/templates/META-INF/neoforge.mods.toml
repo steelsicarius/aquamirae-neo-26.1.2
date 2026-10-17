@@ -1,0 +1,46 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+license = "${mod_license}"
+issueTrackerURL = "${mod_issue_tracker}"
+
+[[mods]]
+    modId = "${mod_id}"
+    version = "${mod_version}"
+    displayName = "${mod_name}"
+    displayURL = "${mod_display_url}"
+    logoFile = "${mod_id}.png"
+    authors = "${mod_author}"
+    credits = "${mod_credits}"
+    description = '''${mod_description}'''
+    updateJSONURL = "${mod_update_url}"
+
+[[mixins]]
+    config = "${mod_id}.mixins.json"
+
+[[dependencies.${mod_id}]]
+    modId = "minecraft"
+    type = "required"
+    versionRange = "${minecraft_version_range}"
+    ordering = "NONE"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "neoforge"
+    type = "required"
+    versionRange = "[${neo_version},)"
+    ordering = "NONE"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "fragmentum"
+    type = "required"
+    versionRange = "[4.0.5,)"
+    ordering = "NONE"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "geckolib"
+    type = "required"
+    versionRange = "[${geckolib_version},)"
+    ordering = "NONE"
+    side = "BOTH"

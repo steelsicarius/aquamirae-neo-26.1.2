@@ -1,0 +1,27 @@
+# eclipse
+bin
+*.launch
+.settings
+.metadata
+.classpath
+.project
+
+# idea
+out
+*.ipr
+*.iws
+*.iml
+.idea
+
+# gradle
+build
+.gradle
+
+# other
+eclipse
+run
+runs
+repo
+
+# Files from the original 1.21.1 project that are not needed here
+*.bbmodel.bak
