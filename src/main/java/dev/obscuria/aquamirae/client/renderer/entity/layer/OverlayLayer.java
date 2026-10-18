@@ -1,7 +1,8 @@
 package dev.obscuria.aquamirae.client.renderer.entity.layer;
 
 import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.EyesLayer;
 import net.minecraft.resources.Identifier;
@@ -13,7 +14,7 @@ public class OverlayLayer<T extends Entity, M extends EntityModel<T>> extends Ey
 
     public OverlayLayer(RenderLayerParent<T, M> parent, Identifier texture) {
         super(parent);
-        this.renderType = RenderType.eyes(texture);
+        this.renderType = RenderTypes.eyes(texture);
     }
 
     @Override

@@ -66,7 +66,7 @@ public class AbstractChakram extends Projectile {
 
     @Override
     protected void onHitEntity(EntityHitResult result) {
-        if (result.getEntity().hurt(getOwner() instanceof LivingEntity owner
+        if (result.getEntity().hurtOrSimulate(getOwner() instanceof LivingEntity owner
                 ? damageSources().mobProjectile(this, owner)
                 : damageSources().generic(), 3f)) {
             onHurtEntity(result);

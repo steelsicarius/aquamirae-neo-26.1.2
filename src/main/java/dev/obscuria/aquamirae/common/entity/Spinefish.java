@@ -9,9 +9,9 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.SpawnGroupData;
-import net.minecraft.world.entity.animal.AbstractSchoolingFish;
+import net.minecraft.world.entity.animal.fish.AbstractSchoolingFish;
 import net.minecraft.world.entity.animal.fish.WaterAnimal;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -23,11 +23,6 @@ public class Spinefish extends AbstractSchoolingFish {
 
     public Spinefish(EntityType<? extends Spinefish> type, Level level) {
         super(type, level);
-    }
-
-    @Override
-    public ItemStack getBucketItemStack() {
-        return Items.AIR.getDefaultInstance();
     }
 
     @Override
@@ -53,7 +48,7 @@ public class Spinefish extends AbstractSchoolingFish {
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(
             ServerLevelAccessor level, DifficultyInstance difficulty,
-            MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData
+            EntitySpawnReason spawnType, @Nullable SpawnGroupData spawnGroupData
     ) {
         ConfiguredAttribute.applyAttributes(this, CommonConfig.SPINEFISH_ATTRIBUTES);
         return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
@@ -61,7 +56,7 @@ public class Spinefish extends AbstractSchoolingFish {
 
     public static boolean checkSpawnRules(
             EntityType<Spinefish> type, ServerLevelAccessor levelAccessor,
-            MobSpawnType spawnType, BlockPos pos, RandomSource random
+            EntitySpawnReason spawnType, BlockPos pos, RandomSource random
     ) {
         return WaterAnimal.checkSurfaceWaterAnimalSpawnRules(type, levelAccessor, spawnType, pos, random);
     }

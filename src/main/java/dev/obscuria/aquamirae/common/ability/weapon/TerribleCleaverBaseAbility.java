@@ -27,7 +27,7 @@ public final class TerribleCleaverBaseAbility extends SimpleAbility implements I
 
     @Override
     public void modifyOutgoingDamage(LivingEntity self, LivingEntity victim, DamageContext damage) {
-        if (!victim.getType().is(AquamiraeEntityTypeTags.ICE_MAZE_CREATURES)) return;
+        if (!victim.getType().builtInRegistryHolder().is(AquamiraeEntityTypeTags.ICE_MAZE_CREATURES)) return;
         if (self.getHealth() >= self.getMaxHealth()) return;
         damage.multiply(1f + computeVariable(VAR_BONUS, self));
     }

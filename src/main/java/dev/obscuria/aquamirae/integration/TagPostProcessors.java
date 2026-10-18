@@ -45,11 +45,11 @@ public final class TagPostProcessors {
     }
 
     public static String directoryFor(ResourceKey<? extends Registry<?>> registryKey) {
-        String irregular = IRREGULAR_DIRECTORIES.get(registryKey.location());
+        String irregular = IRREGULAR_DIRECTORIES.get(registryKey.identifier());
         if (irregular != null) {
             return irregular;
         }
-        return "tags/" + registryKey.location().getPath();
+        return "tags/" + registryKey.identifier().getPath();
     }
 
     static {

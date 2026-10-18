@@ -2,6 +2,7 @@ package dev.obscuria.aquamirae.common.entity;
 
 import dev.obscuria.aquamirae.AquamiraeHelper;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -13,6 +14,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.fish.WaterAnimal;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.phys.Vec3;
@@ -42,11 +44,11 @@ public class AbyssalScyphoid extends WaterAnimal {
     public void tick() {
         super.tick();
 
-        if (!isInWaterOrBubble()) {
+        if (!(isInWater() || this.level().getBlockState(this.blockPosition()).is(Blocks.BUBBLE_COLUMN))) {
             hurt(damageSources().dryOut(), 1000f);
         }
 
-        if (level().isClientSide && !isSilent() && isSquishTick()) {
+        if (level().isClientSide() && !isSilent() && isSquishTick()) {
             level().playLocalSound(blockPosition(),
                     SoundEvents.BUBBLE_COLUMN_BUBBLE_POP, SoundSource.HOSTILE,
                     3, 2f - (float) getAttributeValue(Attributes.SCALE), false);
@@ -54,8 +56,8 @@ public class AbyssalScyphoid extends WaterAnimal {
     }
 
     @Override
-    public boolean hurt(DamageSource source, float damage) {
-        if (super.hurt(source, damage)) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
+        if (super.hurtServer(level, source, damage)) {
             doPoison(source.getDirectEntity());
             return true;
         }
@@ -65,7 +67,7 @@ public class AbyssalScyphoid extends WaterAnimal {
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(
             ServerLevelAccessor level, DifficultyInstance difficulty,
-            MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData
+            EntitySpawnReason spawnType, @Nullable SpawnGroupData spawnGroupData
     ) {
         Objects.requireNonNull(getAttribute(Attributes.MAX_HEALTH)).setBaseValue(Math.round(16 * getAttributeValue(Attributes.SCALE)));
         return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
@@ -103,7 +105,7 @@ public class AbyssalScyphoid extends WaterAnimal {
     public static boolean checkSpawnRules(
             EntityType<AbyssalScyphoid> type,
             ServerLevelAccessor levelAccessor,
-            MobSpawnType spawnType,
+            EntitySpawnReason spawnType,
             BlockPos pos,
             RandomSource random
     ) {

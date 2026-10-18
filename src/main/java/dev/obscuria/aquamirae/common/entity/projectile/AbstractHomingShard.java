@@ -1,6 +1,8 @@
 package dev.obscuria.aquamirae.common.entity.projectile;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -39,7 +41,7 @@ public abstract class AbstractHomingShard extends AbstractShard {
     @Override
     public void tick() {
         super.tick();
-        if (this.level().isClientSide || this.tickCount % 30 != 0) return;
+        if (this.level().isClientSide() || this.tickCount % 30 != 0) return;
         this.markHurt();
     }
 
@@ -83,15 +85,15 @@ public abstract class AbstractHomingShard extends AbstractShard {
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag);
-        tag.putFloat("HomingStrength", this.entityData.get(HOMING_STRENGTH));
+    protected void addAdditionalSaveData(ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putFloat("HomingStrength", this.entityData.get(HOMING_STRENGTH));
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag);
-        this.entityData.set(HOMING_STRENGTH, tag.getFloat("HomingStrength"));
+    protected void readAdditionalSaveData(ValueInput input) {
+        super.readAdditionalSaveData(input);
+        this.entityData.set(HOMING_STRENGTH, input.getFloatOr("HomingStrength", 0f));
     }
 
     static {

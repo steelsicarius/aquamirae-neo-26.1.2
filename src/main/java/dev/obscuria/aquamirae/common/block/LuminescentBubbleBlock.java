@@ -4,7 +4,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -13,8 +12,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.SoundType;
@@ -45,7 +45,7 @@ public class LuminescentBubbleBlock extends Block implements SimpleWaterloggedBl
                 .offsetType(OffsetType.XYZ)
                 .noCollision()
                 .noOcclusion()
-                .hasPostProcess((bs, br, bp) -> true)
+                .postProcess((bs, br, bp) -> bp)
                 .emissiveRendering((bs, br, bp) -> true)
                 .dynamicShape());
         this.registerDefaultState(stateDefinition.any().setValue(WATERLOGGED, false));
@@ -73,7 +73,7 @@ public class LuminescentBubbleBlock extends Block implements SimpleWaterloggedBl
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        var offset = state.getOffset(level, pos);
+        var offset = state.getOffset(pos);
         return SHAPE.move(offset.x, offset.y, offset.z);
     }
 
@@ -97,11 +97,10 @@ public class LuminescentBubbleBlock extends Block implements SimpleWaterloggedBl
 
     @Override
     public BlockState updateShape(
-            BlockState state, Direction facing, BlockState facingState,
-            LevelAccessor level, BlockPos currentPos, BlockPos facingPos
+            BlockState state, LevelReader level, ScheduledTickAccess ticks,
+            BlockPos currentPos, Direction facing, BlockPos facingPos, BlockState facingState, RandomSource random
     ) {
-        if (state.getValue(WATERLOGGED)) level.scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
-        return super.updateShape(state, facing, facingState, level, currentPos, facingPos);
+if (state.getValue(WATERLOGGED)) ticks.scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(level));        return super.updateShape(state, level, ticks, currentPos, facing, facingPos, facingState, random);
     }
 
     @Override

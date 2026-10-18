@@ -5,12 +5,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.SoundType;
@@ -76,11 +78,10 @@ public class GoldenMothJarBlock extends Block implements SimpleWaterloggedBlock 
 
     @Override
     public BlockState updateShape(
-            BlockState state, Direction facing, BlockState facingState,
-            LevelAccessor level, BlockPos currentPos, BlockPos facingPos
+            BlockState state, LevelReader level, ScheduledTickAccess ticks,
+            BlockPos currentPos, Direction facing, BlockPos facingPos, BlockState facingState, RandomSource random
     ) {
-        if (state.getValue(WATERLOGGED)) level.scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
-        return super.updateShape(state, facing, facingState, level, currentPos, facingPos);
+if (state.getValue(WATERLOGGED)) ticks.scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(level));        return super.updateShape(state, level, ticks, currentPos, facing, facingPos, facingState, random);
     }
 
     @Override
@@ -90,12 +91,12 @@ public class GoldenMothJarBlock extends Block implements SimpleWaterloggedBlock 
     ) {
         super.setPlacedBy(level, pos, state, entity, stack);
         if (level instanceof ServerLevel serverLevel) {
-            @Nullable var goldenMoth = AquamiraeEntityTypes.GOLDEN_MOTH.get().create(serverLevel);
+            @Nullable var goldenMoth = AquamiraeEntityTypes.GOLDEN_MOTH.get().create(serverLevel, EntitySpawnReason.MOB_SUMMONED);
             if (goldenMoth == null) return;
             goldenMoth.moveTo(pos.getCenter().add(0, -0.2, 0));
             goldenMoth.setPersistenceRequired();
-            var difficulty = level.getCurrentDifficultyAt(goldenMoth.blockPosition());
-            goldenMoth.finalizeSpawn(serverLevel, difficulty, MobSpawnType.MOB_SUMMONED, null);
+            var difficulty = serverLevel.getCurrentDifficultyAt(goldenMoth.blockPosition());
+            goldenMoth.finalizeSpawn(serverLevel, difficulty, EntitySpawnReason.MOB_SUMMONED, null);
             level.addFreshEntity(goldenMoth);
         }
     }

@@ -14,7 +14,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -43,7 +45,6 @@ import net.minecraft.world.level.pathfinder.PathFinder;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.CollisionContext;
 import org.jetbrains.annotations.Nullable;
 import com.geckolib.animatable.GeoEntity;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -125,7 +126,7 @@ public class Scuttler extends Animal implements GeoEntity {
         this.localInWater = Mth.clamp(localInWater + (getInBlockState().is(Blocks.WATER) ? 0.25f : -0.25f), 0f, 1f);
 
         this.floatOnWater();
-        this.checkInsideBlocks();
+        this.applyEffectsFromBlocks(this.position(), this.position());
         if (level().isClientSide()) return;
         if (!isBeetled() || tickCount % 18 != 0) return;
         float pitch = 0.95F + 0.1F * random.nextFloat();
@@ -148,9 +149,9 @@ public class Scuttler extends Animal implements GeoEntity {
                 this.addBaseScale(0.25);
                 this.ticksSinceEaten = 0;
             } else if (ticksSinceEaten > 60 && (ticksSinceEaten - 2) % 4 == 0) {
-                this.playSound(getEatingSound(stack), 1f, 1f);
+                this.playSound(SoundEvents.GENERIC_EAT.value(), 1f, 1f);
                 this.level().broadcastEntityEvent(this, (byte) 45);
-                level.sendParticles(new ItemParticleOption(ParticleTypes.ITEM, stack),
+                level.sendParticles(new ItemParticleOption(ParticleTypes.ITEM, ItemStackTemplate.fromNonEmptyStack(stack)),
                         getX(), getEyeY(), getZ(), 6,
                         0.15, 0.15, 0.15, 0.02);
             }
@@ -168,8 +169,8 @@ public class Scuttler extends Animal implements GeoEntity {
     }
 
     @Override
-    public boolean hurt(DamageSource source, float amount) {
-        if (!super.hurt(source, amount)) return false;
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
+        if (!super.hurtServer(level, source, amount)) return false;
         if (source.getEntity() == null) return true;
         this.maybeDropStolenItem();
         this.addDeltaMovement(new Vec3(0.0, 0.1, 0.0));
@@ -179,27 +180,27 @@ public class Scuttler extends Animal implements GeoEntity {
     }
 
     @Override
-    public ItemStack equipItemIfPossible(ItemStack stack) {
+    public ItemStack equipItemIfPossible(ServerLevel level, ItemStack stack) {
         if (isBeetled() || !getStolenItem().isEmpty()) return ItemStack.EMPTY;
         this.setStolenItem(stack);
         return stack;
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag);
-        tag.putBoolean("IsBeetled", isBeetled());
+    public void addAdditionalSaveData(ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putBoolean("IsBeetled", isBeetled());
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag);
-        this.setBeetled(tag.getBoolean("IsBeetled"));
+    public void readAdditionalSaveData(ValueInput input) {
+        super.readAdditionalSaveData(input);
+        this.setBeetled(input.getBooleanOr("IsBeetled", false));
     }
 
     @Override
     public boolean isFood(ItemStack stack) {
-        return stack.is(AquamiraeItems.JELLYFISH_JELLY.asItem());
+        return stack.is(AquamiraeItems.JELLYFISH_JELLY.get());
     }
 
     @Override
@@ -231,8 +232,8 @@ public class Scuttler extends Animal implements GeoEntity {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "Default", 10, state -> {
-            if (state.getAnimatable().isBeetled())
+        controllers.add(new AnimationController<Scuttler>("Default", 10, state -> {
+            if (state.animatable().isBeetled())
                 return state.setAndContinue(ANIM_BEETLED);
             return state.setAndContinue(DefaultAnimations.WALK);
         }).setOverrideEasingType(EasingType.EASE_IN_OUT_BACK));
@@ -251,7 +252,7 @@ public class Scuttler extends Animal implements GeoEntity {
     @Override
     public SpawnGroupData finalizeSpawn(
             ServerLevelAccessor level, DifficultyInstance difficulty,
-            MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData
+            EntitySpawnReason spawnType, @Nullable SpawnGroupData spawnGroupData
     ) {
         ConfiguredAttribute.applyAttributes(this, CommonConfig.SCUTTLER_ATTRIBUTES);
         var variantModifier = Mth.clampedMap(getBaseScale(), 0.5f, 1.5f, -1f, 1f);
@@ -280,12 +281,12 @@ public class Scuttler extends Animal implements GeoEntity {
     private void evolveToShellback() {
         if (!(level() instanceof ServerLevel level)) return;
         var entity = new Shellback(AquamiraeEntityTypes.SHELLBACK.get(), level());
-        entity.moveTo(getX(), getY(), getZ(), getYRot(), getXRot());
+        entity.snapTo(getX(), getY(), getZ(), getYRot(), getXRot());
         entity.setYBodyRot(yBodyRot);
         entity.setYHeadRot(getYHeadRot());
         this.level().addFreshEntity(entity);
         var difficulty = level.getCurrentDifficultyAt(blockPosition());
-        entity.finalizeSpawn(level, difficulty, MobSpawnType.BREEDING, null);
+        entity.finalizeSpawn(level, difficulty, EntitySpawnReason.BREEDING, null);
         this.playSound(AquamiraeSounds.ENTITY_SCUTTLER_HURT, 1f, 1f);
         this.maybeDropStolenItem();
         this.discard();
@@ -300,20 +301,19 @@ public class Scuttler extends Animal implements GeoEntity {
     }
 
     private boolean canEat(ItemStack stack) {
-        return getBaseScale() < 3.5 && stack.is(AquamiraeItems.JELLYFISH_JELLY.asItem());
+        return getBaseScale() < 3.5 && stack.is(AquamiraeItems.JELLYFISH_JELLY.get());
     }
 
     private void maybeDropStolenItem() {
         if (getStolenItem().isEmpty()) return;
-        this.spawnAtLocation(getStolenItem());
+        if (this.level() instanceof ServerLevel server) this.spawnAtLocation(server, getStolenItem());
         this.setStolenItem(ItemStack.EMPTY);
     }
 
     private void floatOnWater() {
         if (this.isInWater()) {
-            var context = CollisionContext.of(this);
-            if (context.isAbove(LiquidBlock.STABLE_SHAPE, blockPosition(), true)
-                    && !level().isWaterAt(blockPosition().above())) {
+            var fluid = this.level().getFluidState(this.blockPosition());
+            if (fluid.getAmount() >= 8 && !this.level().getFluidState(this.blockPosition().above()).is(FluidTags.WATER)) {
                 this.setOnGround(true);
             } else {
                 this.setDeltaMovement(getDeltaMovement().scale(0.5F).add(0, 0.05, 0));
@@ -323,7 +323,7 @@ public class Scuttler extends Animal implements GeoEntity {
 
     public static boolean checkSpawnRules(
             EntityType<Scuttler> type, ServerLevelAccessor level,
-            MobSpawnType spawnType, BlockPos pos, RandomSource random
+            EntitySpawnReason spawnType, BlockPos pos, RandomSource random
     ) {
         return level.getBlockState(pos.below()).is(AquamiraeBlockTags.SCUTTLER_SPAWNABLE_ON);
     }

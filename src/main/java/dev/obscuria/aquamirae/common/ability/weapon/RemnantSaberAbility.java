@@ -38,14 +38,14 @@ public final class RemnantSaberAbility extends SimpleAbility implements IDamageH
     public void modifyOutgoingDamage(LivingEntity self, LivingEntity victim, DamageContext damage) {
         if (self.getType() == AquamiraeEntityTypes.CAPTAIN_CORNELIA.get())
             self.heal(Math.min(30, victim.getMaxHealth() * 0.4f));
-        if (victim.getType().is(AquamiraeEntityTypeTags.ICE_MAZE_CREATURES))
+        if (victim.getType().builtInRegistryHolder().is(AquamiraeEntityTypeTags.ICE_MAZE_CREATURES))
             damage.multiply(1f + computeVariable(VAR_BASE_BONUS, self));
     }
 
     public static void onDamageDealtCallback(LivingEntity self, LivingEntity victim) {
         if (!victim.isDeadOrDying()) return;
         if (!(self instanceof Player player)) return;
-        if (!victim.getType().is(AquamiraeEntityTypeTags.ICE_MAZE_CREATURES)) return;
+        if (!victim.getType().builtInRegistryHolder().is(AquamiraeEntityTypeTags.ICE_MAZE_CREATURES)) return;
         var bonusPerKill = SHARED.computeVariable(VAR_PER_KILL, self);
         PlayerHelper.addRemnantSaberBonus(player, bonusPerKill);
     }

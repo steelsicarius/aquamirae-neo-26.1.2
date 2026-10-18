@@ -31,7 +31,7 @@ public final class DaggerOfGreedAbility extends SimpleAbility implements IDamage
     @Override
     public void onDamageDealt(LivingEntity self, LivingEntity victim, DamageSource source) {
         if (self.getRandom().nextFloat() < computeEmeraldChance(self, victim))
-            victim.spawnAtLocation(Items.EMERALD);
+            if (victim.level() instanceof net.minecraft.server.level.ServerLevel victimLevel) victim.spawnAtLocation(victimLevel, Items.EMERALD);
         if (self.getRandom().nextFloat() < computeVariable(VAR_BREAK_CHANCE, self)) {
             self.onEquippedItemBroken(self.getMainHandItem().getItem(), EquipmentSlot.MAINHAND);
             self.getMainHandItem().shrink(1);

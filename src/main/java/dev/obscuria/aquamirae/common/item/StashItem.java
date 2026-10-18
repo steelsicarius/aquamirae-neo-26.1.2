@@ -3,13 +3,13 @@ package dev.obscuria.aquamirae.common.item;
 import dev.obscuria.aquamirae.common.block.StashBlock;
 import dev.obscuria.fragmentum.v2.api.common.registry.DeferredBlock;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -31,13 +31,13 @@ public class StashItem extends BlockItem {
 
     @SuppressWarnings("deprecation")
     public Identifier getLootTableId(ItemStack stack) {
-        return builtInRegistryHolder().key().location().withPrefix("stashes/");
+        return builtInRegistryHolder().key().identifier().withPrefix("stashes/");
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         var stack = player.getItemInHand(hand);
-        player.getCooldowns().addCooldown(this, 10);
+        player.getCooldowns().addCooldown(stack, 10);
         player.swing(hand);
         if (!level.isClientSide()) {
             level.playSound(null, player, openSound, SoundSource.PLAYERS, 1.0F, 1.0F);
@@ -48,7 +48,7 @@ public class StashItem extends BlockItem {
             if (!player.getAbilities().instabuild)
                 stack.shrink(1);
         }
-        return InteractionResultHolder.consume(stack);
+        return InteractionResult.CONSUME;
     }
 
     public static void generateLoot(Identifier lootTableId, Player player, Consumer<ItemStack> consumer) {

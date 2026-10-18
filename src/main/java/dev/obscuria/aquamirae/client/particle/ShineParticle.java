@@ -1,10 +1,14 @@
 package dev.obscuria.aquamirae.client.particle;
 
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.particle.*;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.util.RandomSource;
 
-public class ShineParticle extends TextureSheetParticle {
+public class ShineParticle extends SingleQuadParticle {
 
     private final SpriteSet spriteSet;
     private float angularVelocity;
@@ -16,7 +20,7 @@ public class ShineParticle extends TextureSheetParticle {
             double vx, double vy, double vz,
             SpriteSet spriteSet
     ) {
-        super(level, x, y, z);
+        super(level, x, y, z, 0, 0, 0, spriteSet.first());
         this.spriteSet = spriteSet;
         this.setSize(0.2f, 0.2f);
         this.quadSize *= 0.8f;
@@ -32,13 +36,13 @@ public class ShineParticle extends TextureSheetParticle {
     }
 
     @Override
-    public int getLightColor(float partialTick) {
+    public int getLightCoords(float partialTick) {
         return 15728880;
     }
 
     @Override
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_LIT;
+    public SingleQuadParticle.Layer getLayer() {
+        return SingleQuadParticle.Layer.OPAQUE;
     }
 
     @Override
@@ -61,7 +65,8 @@ public class ShineParticle extends TextureSheetParticle {
         public Particle createParticle(
                 SimpleParticleType type, ClientLevel level,
                 double x, double y, double z,
-                double vx, double vy, double vz
+                double vx, double vy, double vz,
+                RandomSource random
         ) {
             return new ShineParticle(level, x, y, z, vx, vy, vz, spriteSet);
         }

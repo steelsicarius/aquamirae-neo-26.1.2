@@ -7,9 +7,9 @@ import dev.obscuria.aquamirae.common.component.Keepsake;
 import dev.obscuria.aquamirae.config.ConfiguredAttribute;
 import dev.obscuria.aquamirae.registry.AquamiraeAttributes;
 import dev.obscuria.aquamirae.registry.AquamiraeDataComponents;
-import dev.obscuria.fragmentum.content.util.color.RGB;
-import dev.obscuria.fragmentum.v2.api.common.richtext.RichTextOptions;
+import dev.obscuria.fragmentum.v2.api.common.Color;
 import dev.obscuria.fragmentum.v2.api.common.richtext.RichText;
+import dev.obscuria.fragmentum.v2.api.common.richtext.RichTextOptions;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -19,7 +19,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.equipment.trim.ArmorTrim;
@@ -37,7 +36,7 @@ import java.util.Optional;
 public record KeepsakeArmor(
         String nickname,
         Optional<String> lore,
-        Optional<RGB> dyedColor,
+        Optional<Color> dyedColor,
         Optional<ArmorTrimConfig> armorTrim,
         Optional<EnchantmentConfig> enchantments,
         List<ItemConfig> items
@@ -54,7 +53,7 @@ public record KeepsakeArmor(
         CODEC = RecordCodecBuilder.create(builder -> builder.group(
                 Codec.STRING.fieldOf("nickname").forGetter(KeepsakeArmor::nickname),
                 Codec.STRING.optionalFieldOf("lore").forGetter(KeepsakeArmor::lore),
-                RGB.CODEC.optionalFieldOf("dyed_color").forGetter(KeepsakeArmor::dyedColor),
+                Color.decimalCodec().optionalFieldOf("dyed_color").forGetter(KeepsakeArmor::dyedColor),
                 ArmorTrimConfig.CODEC.optionalFieldOf("armor_trim").forGetter(KeepsakeArmor::armorTrim),
                 EnchantmentConfig.CODEC.optionalFieldOf("enchantments").forGetter(KeepsakeArmor::enchantments),
                 ItemConfig.CODEC.listOf().fieldOf("items").forGetter(KeepsakeArmor::items)
@@ -65,7 +64,7 @@ public record KeepsakeArmor(
             Item item,
             String name,
             Optional<String> loreOverride,
-            Optional<RGB> dyedColorOverride,
+            Optional<Color> dyedColorOverride,
             Optional<ArmorTrimConfig> armorTrimOverride,
             Optional<EnchantmentConfig> enchantmentOverride,
             List<ConfiguredAttribute> attributes
@@ -78,7 +77,7 @@ public record KeepsakeArmor(
             stack.set(DataComponents.CUSTOM_NAME, Component.literal(name));
             stack.set(AquamiraeDataComponents.KEEPSAKE, new Keepsake(armor.nickname));
             this.loreOverride.or(armor::lore).ifPresent(lore -> applyLore(stack, lore));
-            this.dyedColorOverride.or(armor::dyedColor).ifPresent(color -> applyColor(stack, color.decimal()));
+            this.dyedColorOverride.or(armor::dyedColor).ifPresent(color -> applyColor(stack, color.rgb()));
             this.armorTrimOverride.or(armor::armorTrim).ifPresent(trim -> applyTrim(stack, trim, provider));
             this.enchantmentOverride.or(armor::enchantments).ifPresent(enchantments -> applyEnchantments(stack, enchantments, provider));
             this.applyAttributes(stack, randomSource);
@@ -90,13 +89,13 @@ public record KeepsakeArmor(
         }
 
         private static void applyColor(ItemStack stack, int color) {
-            stack.set(DataComponents.DYED_COLOR, new DyedItemColor(color, false));
+            stack.set(DataComponents.DYED_COLOR, new DyedItemColor(color));
         }
 
         private static void applyTrim(ItemStack stack, ArmorTrimConfig trim, HolderGetter.Provider provider) {
             var pattern = provider.lookupOrThrow(Registries.TRIM_PATTERN).getOrThrow(trim.pattern);
             var material = provider.lookupOrThrow(Registries.TRIM_MATERIAL).getOrThrow(trim.material);
-            stack.set(DataComponents.TRIM, new ArmorTrim(material, pattern, false));
+            stack.set(DataComponents.TRIM, new ArmorTrim(material, pattern));
         }
 
         private static void applyEnchantments(ItemStack stack, EnchantmentConfig enchantments, HolderGetter.Provider provider) {
@@ -108,10 +107,14 @@ public record KeepsakeArmor(
         }
 
         private void applyAttributes(ItemStack stack, RandomSource randomSource) {
-            if (!(stack.getItem() instanceof ArmorItem armorItem)) return;
+            // MC 26.1.2: ArmorItem is gone; the equipment slot is read from the
+            // EQUIPPABLE component instead of the item class.
+            var equippable = stack.get(DataComponents.EQUIPPABLE);
+            if (equippable == null) return;
+            var slot = equippable.slot();
             var builder = ItemAttributeModifiers.builder();
-            var modifierId = Aquamirae.id("armor." + armorItem.getType().getName());
-            var equipmentSlotGroup = EquipmentSlotGroup.bySlot(armorItem.getType().getSlot());
+            var modifierId = Aquamirae.id("armor." + slot.getName());
+            var equipmentSlotGroup = EquipmentSlotGroup.bySlot(slot);
             for (var attribute : attributes) {
                 if (!attribute.isValid()) continue;
                 builder.add(
@@ -132,7 +135,7 @@ public record KeepsakeArmor(
                     BuiltInRegistries.ITEM.byNameCodec().fieldOf("item").forGetter(ItemConfig::item),
                     Codec.STRING.fieldOf("name").forGetter(ItemConfig::name),
                     Codec.STRING.optionalFieldOf("lore").forGetter(ItemConfig::loreOverride),
-                    RGB.CODEC.optionalFieldOf("dyed_color").forGetter(ItemConfig::dyedColorOverride),
+                    Color.decimalCodec().optionalFieldOf("dyed_color").forGetter(ItemConfig::dyedColorOverride),
                     ArmorTrimConfig.CODEC.optionalFieldOf("armor_trim").forGetter(ItemConfig::armorTrimOverride),
                     EnchantmentConfig.CODEC.optionalFieldOf("enchantments").forGetter(ItemConfig::enchantmentOverride),
                     ConfiguredAttribute.CODEC.listOf().fieldOf("attributes").forGetter(ItemConfig::attributes)

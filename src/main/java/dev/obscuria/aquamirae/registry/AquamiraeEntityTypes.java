@@ -6,9 +6,10 @@ import dev.obscuria.aquamirae.common.entity.projectile.AbyssalShard;
 import dev.obscuria.aquamirae.common.entity.projectile.MazeRose;
 import dev.obscuria.aquamirae.common.entity.projectile.TerribleChakram;
 import dev.obscuria.fragmentum.v2.api.common.registry.DeferredEntity;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.level.levelgen.Heightmap;
 
 import java.util.function.Supplier;
 
@@ -75,7 +76,8 @@ public final class AquamiraeEntityTypes {
                     .clientTrackingRange(4));
 
     private static <T extends Entity> DeferredEntity<T> register(String name, Supplier<EntityType.Builder<T>> supplier) {
-        return AquamiraeRegistries.REGISTRAR.registerEntity(Aquamirae.id(name), () -> supplier.get().build(name));
+        var key = ResourceKey.create(Registries.ENTITY_TYPE, Aquamirae.id(name));
+        return AquamiraeRegistries.REGISTRAR.registerEntity(Aquamirae.id(name), () -> supplier.get().build(key));
     }
 
     static void init() {
@@ -93,23 +95,8 @@ public final class AquamiraeEntityTypes {
         registrar.registerAttributes(EEL, Monster::createMonsterAttributes);
         registrar.registerAttributes(TORTURED_SOUL, Monster::createMonsterAttributes);
 
-        registrar.registerSpawnPlacement(
-                SCUTTLER, SpawnPlacementTypes.NO_RESTRICTIONS,
-                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Scuttler::checkSpawnRules);
-        registrar.registerSpawnPlacement(
-                MAW, SpawnPlacementTypes.ON_GROUND,
-                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Maw::checkSpawnRules);
-        registrar.registerSpawnPlacement(
-                TORTURED_SOUL, SpawnPlacementTypes.ON_GROUND,
-                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, TorturedSoul::checkSpawnRules);
-        registrar.registerSpawnPlacement(
-                SPINEFISH, SpawnPlacementTypes.IN_WATER,
-                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Spinefish::checkSpawnRules);
-        registrar.registerSpawnPlacement(
-                ABYSSAL_SCYPHOID, SpawnPlacementTypes.IN_WATER,
-                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, AbyssalScyphoid::checkSpawnRules);
-        registrar.registerSpawnPlacement(
-                ANGLERFISH, SpawnPlacementTypes.IN_WATER,
-                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Anglerfish::checkSpawnRules);
+        // MC 26.1.2 / Fragmentum v4: Registrar#registerSpawnPlacement is gone.
+        // Spawn placements for the entities below must be registered through
+        // NeoForge's RegisterSpawnPlacementsEvent (mod event bus) — see port report.
     }
 }

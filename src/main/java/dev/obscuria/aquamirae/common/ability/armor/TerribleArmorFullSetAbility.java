@@ -28,7 +28,7 @@ public final class TerribleArmorFullSetAbility extends SimpleAbility implements 
 
     @Override
     public void onDamageTaken(LivingEntity self, DamageSource source) {
-        if (!self.isInWaterOrBubble()) return;
+        if (!self.isInWater() && !self.level().getFluidState(self.blockPosition()).is(net.minecraft.tags.FluidTags.BUBBLE_COLUMN)) return;
         var amplifier = Math.round(computeVariable(VAR_AMPLIFIER, self));
         var duration = Math.round(20 * computeVariable(VAR_DURATION, self));
         self.addEffect(new MobEffectInstance(MobEffects.DOLPHINS_GRACE, duration, amplifier));

@@ -13,7 +13,7 @@ public record CrystallizationEvent(
 
     @Override
     public void tick(ServerLevel level) {
-        var registry = entity.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
+        var registry = entity.level().registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE);
         var type = registry.getHolderOrThrow(AquamiraeDamageTypes.CRYSTALLIZATION);
         this.entity.hurt(new DamageSource(type), 999999f);
     }

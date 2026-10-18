@@ -9,7 +9,9 @@ import dev.obscuria.fragmentum.v2.api.config.ConfigValue;
 import lombok.Getter;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -74,7 +76,8 @@ public record ConfiguredAttribute(
         }
 
         var attributeId = Identifier.parse(input.substring(0, operationStart - 1));
-        var attribute = BuiltInRegistries.ATTRIBUTE.getHolder(attributeId);
+        var attributeKey = ResourceKey.create(Registries.ATTRIBUTE, attributeId);
+        var attribute = BuiltInRegistries.ATTRIBUTE.get(attributeKey);
         if (attribute.isEmpty()) {
             throw new IllegalArgumentException("Invalid attribute: " + input);
         }
@@ -96,7 +99,7 @@ public record ConfiguredAttribute(
     @Override
     public String toString() {
         return "%s %s(%s)".formatted(
-                attribute.unwrapKey().orElseThrow().location(),
+                attribute.unwrapKey().orElseThrow().identifier(),
                 operation.name().toLowerCase(Locale.ROOT),
                 value.toString());
     }

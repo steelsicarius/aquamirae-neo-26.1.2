@@ -3,6 +3,7 @@ package dev.obscuria.aquamirae.common.region;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.attribute.AmbientParticle;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.*;
 import net.minecraft.world.level.levelgen.GenerationStep;
@@ -13,7 +14,11 @@ public interface BiomePatcher {
 
     void clearSpawns();
 
-    void addCarver(GenerationStep.Carving step, ResourceKey<ConfiguredWorldCarver<?>> carverKey);
+    /**
+     * MC 26.1.2: the carving generation step is gone; carvers are attached to
+     * the biome directly.
+     */
+    void addCarver(ResourceKey<ConfiguredWorldCarver<?>> carverKey);
 
     void addFeature(GenerationStep.Decoration step, ResourceKey<PlacedFeature> placedFeatureKey);
 
@@ -27,7 +32,7 @@ public interface BiomePatcher {
 
     void setDownfall(float downfall);
 
-    void setAmbientParticle(AmbientParticleSettings settings);
+    void setAmbientParticle(AmbientParticle settings);
 
     void setAmbientLoop(Holder<SoundEvent> sound);
 

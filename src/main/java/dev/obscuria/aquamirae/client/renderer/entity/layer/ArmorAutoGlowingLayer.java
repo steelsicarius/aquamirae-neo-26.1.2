@@ -5,7 +5,8 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.obscuria.aquamirae.client.renderer.AquamiraeArmorRenderer;
 import dev.obscuria.aquamirae.common.item.AquamiraeArmorItem;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import com.geckolib.cache.model.BakedGeoModel;
 import com.geckolib.renderer.layer.builtin.AutoGlowingGeoLayer;
 

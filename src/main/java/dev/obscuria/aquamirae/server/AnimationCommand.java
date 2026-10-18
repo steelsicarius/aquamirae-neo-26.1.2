@@ -20,7 +20,7 @@ public final class AnimationCommand {
             CommandBuildContext context,
             Commands.CommandSelection selection
     ) {
-        dispatcher.register(Commands.literal(Aquamirae.MOD_ID).requires(source -> source.hasPermission(3))
+        dispatcher.register(Commands.literal(Aquamirae.MOD_ID).requires(Commands.hasPermission(Commands.LEVEL_ADMINS))
                 .then(Commands.literal("animation")
                         .then(Commands.argument("target", EntityArgument.entity())
                                 .then(Commands.literal("play")

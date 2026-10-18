@@ -8,7 +8,8 @@ import net.minecraft.util.Util;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.flag.FeatureFlag;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SmithingTemplateItem;
 
 import java.util.List;
@@ -29,20 +30,25 @@ public class AquamiraeSmithingTemplateItem extends SmithingTemplateItem {
 
     private static final ItemTooltip TOOLTIP = ItemTooltip.translate("tooltip.aquamirae.smithing_template", 2, true, false);
 
+    /**
+     * MC 26.1.2: the FeatureFlag varargs parameter is gone and default data
+     * components must be supplied through the item properties.
+     */
     public AquamiraeSmithingTemplateItem(
             Component appliesTo, Component ingredients, Component upgradeDescription,
             Component baseSlotDescription, Component additionsSlotDescription,
             List<Identifier> baseSlotEmptyIcons,
             List<Identifier> additionalSlotEmptyIcons,
-            FeatureFlag... requiredFeatures
+            Properties properties
     ) {
         super(
                 appliesTo, ingredients, upgradeDescription, baseSlotDescription,
                 additionsSlotDescription, baseSlotEmptyIcons,
-                additionalSlotEmptyIcons, requiredFeatures);
-        this.components = DataComponentMap.composite(components(), DataComponentMap.builder()
-                .set(AquamiraeDataComponents.TOOLTIP, TOOLTIP)
-                .build());
+                additionalSlotEmptyIcons, properties);
+    }
+
+    private static Item.Properties properties() {
+        return new Item.Properties().component(AquamiraeDataComponents.TOOLTIP, TOOLTIP);
     }
 
     public static AquamiraeSmithingTemplateItem createTerribleUpgradeTemplate() {
@@ -53,7 +59,8 @@ public class AquamiraeSmithingTemplateItem extends SmithingTemplateItem {
                         Identifier.withDefaultNamespace("item/empty_armor_slot_chestplate"),
                         Identifier.withDefaultNamespace("item/empty_armor_slot_leggings"),
                         Identifier.withDefaultNamespace("item/empty_armor_slot_boots")),
-                List.of(Identifier.withDefaultNamespace("item/empty_slot_amethyst_shard")));
+                List.of(Identifier.withDefaultNamespace("item/empty_slot_amethyst_shard")),
+                properties());
     }
 
     public static AquamiraeSmithingTemplateItem createAbyssalUpgradeTemplate() {
@@ -64,6 +71,7 @@ public class AquamiraeSmithingTemplateItem extends SmithingTemplateItem {
                         Identifier.withDefaultNamespace("item/empty_armor_slot_chestplate"),
                         Identifier.withDefaultNamespace("item/empty_armor_slot_leggings"),
                         Identifier.withDefaultNamespace("item/empty_armor_slot_boots")),
-                List.of(Identifier.withDefaultNamespace("item/empty_slot_amethyst_shard")));
+                List.of(Identifier.withDefaultNamespace("item/empty_slot_amethyst_shard")),
+                properties());
     }
 }

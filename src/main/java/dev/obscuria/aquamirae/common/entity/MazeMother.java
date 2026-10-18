@@ -4,6 +4,7 @@ import dev.obscuria.aquamirae.registry.tags.AquamiraeBlockTags;
 import dev.obscuria.aquamirae.config.CommonConfig;
 import dev.obscuria.aquamirae.config.ConfiguredAttribute;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
@@ -87,10 +88,7 @@ public class MazeMother extends Monster {
         return (float) Mth.lerp(partialTick, verticalMotionO, verticalMotion);
     }
 
-    @Override
-    public AABB getBoundingBoxForCulling() {
-        return super.getBoundingBoxForCulling().inflate(10F);
-    }
+    
 
     @Override
     protected PathNavigation createNavigation(Level level) {
@@ -124,9 +122,9 @@ public class MazeMother extends Monster {
     }
 
     @Override
-    public boolean hurt(DamageSource source, float amount) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
         if (source.is(DamageTypes.DROWN)) return false;
-        return super.hurt(source, amount);
+        return super.hurtServer(level, source, amount);
     }
 
     @Override
@@ -141,7 +139,7 @@ public class MazeMother extends Monster {
     @Override
     public void baseTick() {
         if (this.isInWater()) this.setDeltaMovement(this.getDeltaMovement().add(0, -0.001, 0));
-        if (!this.level().isClientSide) {
+        if (!this.level().isClientSide()) {
             if (tickCount % 10 == 0) {
                 this.breakIce(-1);
                 this.breakIce(4);
@@ -185,7 +183,7 @@ public class MazeMother extends Monster {
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(
             ServerLevelAccessor level, DifficultyInstance difficulty,
-            MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData
+            EntitySpawnReason spawnType, @Nullable SpawnGroupData spawnGroupData
     ) {
         ConfiguredAttribute.applyAttributes(this, CommonConfig.MAZE_MOTHER_ATTRIBUTES);
         return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
@@ -223,7 +221,7 @@ public class MazeMother extends Monster {
 
         @Override
         public boolean canCutCorner(PathType pathType) {
-            return pathType != PathType.DANGER_FIRE && pathType != PathType.DANGER_OTHER;
+            return pathType != PathType.FIRE_IN_NEIGHBOR && pathType != PathType.DAMAGING_IN_NEIGHBOR;
         }
 
         private boolean shouldTargetNextNodeInDirection(Vec3 vec) {

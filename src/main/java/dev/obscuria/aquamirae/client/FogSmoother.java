@@ -1,6 +1,5 @@
 package dev.obscuria.aquamirae.client;
 
-import com.mojang.blaze3d.shaders.FogShape;
 import org.jetbrains.annotations.Nullable;
 
 public final class FogSmoother {
@@ -18,7 +17,6 @@ public final class FogSmoother {
     private boolean hadCustomColor = false;
     private float distBlend = 0f;
     private float customStart, customEnd;
-    private FogShape customShape = FogShape.SPHERE;
     private boolean hadCustomDist = false;
 
     public static final FogSmoother INSTANCE = new FogSmoother();
@@ -55,14 +53,13 @@ public final class FogSmoother {
     }
 
     public DistResult smoothDistance(
-            float vanillaStart, float vanillaEnd, FogShape vanillaShape,
+            float vanillaStart, float vanillaEnd,
             @Nullable FogEvents.FogDistanceResult override,
             float dt
     ) {
         if (override != null) {
             customStart = override.start;
             customEnd = override.end;
-            customShape = override.shape;
             hadCustomDist = true;
         }
 
@@ -73,13 +70,11 @@ public final class FogSmoother {
         if (!hadCustomDist || distBlend <= 0.0001f) {
             distResult.start = vanillaStart;
             distResult.end = vanillaEnd;
-            distResult.shape = vanillaShape;
             return distResult;
         }
 
         distResult.start = lerp(distBlend, vanillaStart, customStart);
         distResult.end = lerp(distBlend, vanillaEnd, customEnd);
-        distResult.shape = (distBlend >= 0.5f) ? customShape : vanillaShape;
         return distResult;
     }
 
@@ -106,6 +101,5 @@ public final class FogSmoother {
     public static final class DistResult {
 
         public float start, end;
-        public FogShape shape;
     }
 }

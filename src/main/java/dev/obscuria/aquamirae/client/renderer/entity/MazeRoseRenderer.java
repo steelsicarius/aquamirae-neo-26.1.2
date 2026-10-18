@@ -7,7 +7,8 @@ import dev.obscuria.aquamirae.client.model.AquamiraeModelLayers;
 import dev.obscuria.aquamirae.client.model.ModelMazeRose;
 import dev.obscuria.aquamirae.common.entity.projectile.MazeRose;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -46,7 +47,7 @@ public class MazeRoseRenderer<T extends MazeRose> extends EntityRenderer<T> {
             this.model.renderToBuffer(pose, consumer, packedLight, OverlayTexture.NO_OVERLAY, -1);
         }
         {
-            var consumer = buffer.getBuffer(RenderType.eyes(OVERLAY_TEXTURE));
+            var consumer = buffer.getBuffer(RenderTypes.eyes(OVERLAY_TEXTURE));
             this.model.renderToBuffer(pose, consumer, packedLight, OverlayTexture.NO_OVERLAY, -1);
         }
         pose.popPose();

@@ -10,9 +10,11 @@ import dev.obscuria.aquamirae.registry.AquamiraeSounds;
 import dev.obscuria.aquamirae.registry.tags.AquamiraeBlockTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -77,16 +79,12 @@ public class Eel extends Monster implements IAnimatable {
 	}
 
     @Override
-    public boolean doHurtTarget(Entity entity) {
-        if (!super.doHurtTarget(entity)) return false;
+    public boolean doHurtTarget(ServerLevel level, Entity entity) {
+        if (!super.doHurtTarget(level, entity)) return false;
         AquamiraeHelper.doPoison(this, entity, 100, 2);
         return true;
     }
-
-	@Override
-	public AABB getBoundingBoxForCulling() {
-		return super.getBoundingBoxForCulling().inflate(2f);
-	}
+    // TODO 26.1.2: Entity#getBoundingBoxForCulling() was removed; this entity used to enlarge its culling/render box. Re-implement once a 26.1.2 replacement is identified.
 
 	@Override
 	protected void registerGoals() {
@@ -108,27 +106,27 @@ public class Eel extends Monster implements IAnimatable {
 	}
 
 	@Override
-	public void addAdditionalSaveData(CompoundTag tag) {
-		super.addAdditionalSaveData(tag);
-		CompoundTag data = new CompoundTag();
+	public void addAdditionalSaveData(ValueOutput output) {
+		super.addAdditionalSaveData(output);
+		ValueOutput data = output.child("EelData");
 		data.putInt("MoveCooldown", this.getEntityData().get(MOVE_COOLDOWN));
 		data.putInt("Hits", this.getEntityData().get(HIT_SERIES));
 		data.putFloat("x", this.getEntityData().get(POS_X));
 		data.putFloat("y", this.getEntityData().get(POS_Y));
 		data.putFloat("z", this.getEntityData().get(POS_Z));
-		tag.put("EelData", data);
 	}
 
 	@Override
-	public void readAdditionalSaveData(CompoundTag tag) {
-		super.readAdditionalSaveData(tag);
-		CompoundTag data = (CompoundTag) tag.get("EelData");
-		if (data == null) return;
-		this.getEntityData().set(MOVE_COOLDOWN, data.getInt("MoveCooldown"));
-		this.getEntityData().set(HIT_SERIES, data.getInt("Hits"));
-		this.getEntityData().set(POS_X, data.getFloat("x"));
-		this.getEntityData().set(POS_Y, data.getFloat("y"));
-		this.getEntityData().set(POS_Z, data.getFloat("z"));
+	public void readAdditionalSaveData(ValueInput input) {
+		super.readAdditionalSaveData(input);
+		var data = input.child("EelData");
+		if (data.isEmpty()) return;
+		var d = data.get();
+		this.getEntityData().set(MOVE_COOLDOWN, d.getIntOr("MoveCooldown", 200));
+		this.getEntityData().set(HIT_SERIES, d.getIntOr("Hits", 0));
+		this.getEntityData().set(POS_X, d.getFloatOr("x", 0f));
+		this.getEntityData().set(POS_Y, d.getFloatOr("y", 0f));
+		this.getEntityData().set(POS_Z, d.getFloatOr("z", 0f));
 	}
 
 	@Override
@@ -173,7 +171,7 @@ public class Eel extends Monster implements IAnimatable {
 					this.roarState.play(this, 100);
 				if (distance <= 24 && this.attackState.getTick() == 14) {
 					final float hp = target.getHealth();
-					this.doHurtTarget(target);
+					if (this.level() instanceof ServerLevel server) this.doHurtTarget(server, target);
 					if (target.getHealth() < hp) this.heal((hp - target.getHealth()) * 2);
 				}
 				//ROAR
@@ -196,7 +194,7 @@ public class Eel extends Monster implements IAnimatable {
 						final Vec3 targetDelta = target.getDeltaMovement();
 						final Vec3 roarVec = thisVec.vectorTo(targetVec).scale(0.07).scale(Math.max(0, 1.0 - distance / 150.0));
 						target.setDeltaMovement(targetDelta.x + roarVec.x, targetDelta.y, targetDelta.z + roarVec.z);
-                        target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 200, 1));
+                        target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 200, 1));
                         target.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 200, 1));
                         target.setTicksFrozen(target.getTicksFrozen() + 1);
                         if (target instanceof Player player) player.hurtMarked = true;
@@ -302,17 +300,17 @@ public class Eel extends Monster implements IAnimatable {
 	}
 
 	@Override
-	public boolean hurt(DamageSource source, float amount) {
+	public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
 		if (this.digState.isPlaying()) return false;
 		if (source.getDirectEntity() instanceof AbstractArrow) return false;
 		if (source.is(DamageTypes.FALL) || source.is(DamageTypes.CACTUS) || source.is(DamageTypes.DROWN)) return false;
-		return super.hurt(source, amount);
+		return super.hurtServer(level, source, amount);
 	}
 
 	@Override
 	public @Nullable SpawnGroupData finalizeSpawn(
 			ServerLevelAccessor level, DifficultyInstance difficulty,
-			MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData
+			EntitySpawnReason spawnType, @Nullable SpawnGroupData spawnGroupData
 	) {
 		ConfiguredAttribute.applyAttributes(this, CommonConfig.EEL_ATTRIBUTES);
 		return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);

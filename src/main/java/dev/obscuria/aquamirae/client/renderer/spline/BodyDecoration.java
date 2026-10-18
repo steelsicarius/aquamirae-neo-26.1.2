@@ -6,7 +6,8 @@ import dev.obscuria.aquamirae.common.SplineBody;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import org.joml.Vector3f;
@@ -34,7 +35,7 @@ public abstract class BodyDecoration extends Model {
         var scale = resolveScale(context);
         pose.scale(scale, scale, scale);
         renderToBuffer(pose, buffer.getBuffer(renderType(getTexture())), packedLight, packedOverlay, -1);
-        renderToBuffer(pose, buffer.getBuffer(RenderType.eyes(getOverlayTexture())), packedLight, packedOverlay, -1);
+        renderToBuffer(pose, buffer.getBuffer(RenderTypes.eyes(getOverlayTexture())), packedLight, packedOverlay, -1);
         pose.popPose();
     }
 

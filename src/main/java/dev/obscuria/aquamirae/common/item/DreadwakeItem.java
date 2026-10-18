@@ -2,14 +2,13 @@ package dev.obscuria.aquamirae.common.item;
 
 import dev.obscuria.aquamirae.registry.AquamiraeDataComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.SwordItem;
-import net.minecraft.world.item.Tier;
 
-public class DreadwakeItem extends SwordItem {
+public class DreadwakeItem extends Item {
 
-    public DreadwakeItem(Tier tier, Properties properties) {
-        super(tier, properties);
+    public DreadwakeItem(Properties properties) {
+        super(properties);
     }
 
     @Override

@@ -15,13 +15,13 @@ import dev.obscuria.aquamirae.registry.AquamiraeParticleTypes;
 import dev.obscuria.aquamirae.registry.AquamiraeSounds;
 import dev.obscuria.aquamirae.server.event.ShipbreakerEvent;
 import dev.obscuria.fragmentum.v2.api.common.network.FragmentumNetworking;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -80,7 +80,7 @@ public class CaptainCorneliaBoss extends Monster implements IAnimatable, INoHurt
 
     public CaptainCorneliaBoss(EntityType<CaptainCorneliaBoss> type, Level world) {
         super(type, world);
-        this.bossInfo = new ServerBossEvent(getDisplayName(),
+        this.bossInfo = new ServerBossEvent(Mth.createInsecureUUID(this.getRandom()), getDisplayName(),
                 ServerBossEvent.BossBarColor.BLUE,
                 ServerBossEvent.BossBarOverlay.PROGRESS);
         this.pullAttackState = new AnimState("pull_attack", 30);
@@ -134,16 +134,15 @@ public class CaptainCorneliaBoss extends Monster implements IAnimatable, INoHurt
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag);
-        tag.putInt(TAG_NAME_PHASE, this.getPhase());
+    public void addAdditionalSaveData(ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putInt(TAG_NAME_PHASE, this.getPhase());
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag);
-        if (tag.contains(TAG_NAME_PHASE, Tag.TAG_INT))
-            setPhase(tag.getInt(TAG_NAME_PHASE));
+    public void readAdditionalSaveData(ValueInput input) {
+        super.readAdditionalSaveData(input);
+        setPhase(input.getIntOr(TAG_NAME_PHASE, 0));
     }
 
     @Override
@@ -176,7 +175,7 @@ public class CaptainCorneliaBoss extends Monster implements IAnimatable, INoHurt
             modifyYRot(EntityUtils.getYAngleBetween(this, target), this.onGround() ? 0.15f : 0.3f);
             this.lookControl.setLookAt(target);
 
-            if (!this.isInAction() && !this.level().isClientSide) {
+            if (!this.isInAction() && !this.level().isClientSide()) {
                 if (this.weaponSwitchTick > WEAPON_SWITCH_INTERVAL
                         && random.nextFloat() < (this.weaponSwitchTick - WEAPON_SWITCH_INTERVAL) / 5000f) {
                     this.weaponSwitchState.play(this, 20);
@@ -196,8 +195,8 @@ public class CaptainCorneliaBoss extends Monster implements IAnimatable, INoHurt
                         .vectorTo(new Vec3(target.getX(), target.getY() + 0.1F, target.getZ())).scale(0.2F));
             if (this.swingAttackState.getTick() == 14 && distance < 9)
                 EntityUtils.getRelativeEntities(this, LivingEntity.class,
-                        5f, 0f, 0f, 6f, true, true).forEach(e -> {if (e != this) this.doHurtTarget(e);});
-            if (this.thurstAttackState.getTick() == 14 && distance < 12) this.doHurtTarget(target);
+                        5f, 0f, 0f, 6f, true, true).forEach(e -> {if (e != this && this.level() instanceof ServerLevel server) this.doHurtTarget(server, e);});
+            if (this.thurstAttackState.getTick() == 14 && distance < 12 && this.level() instanceof ServerLevel server) this.doHurtTarget(server, target);
 
             if (this.isUnderWater() && !this.hasEffect(MobEffects.LEVITATION))
                 this.setDeltaMovement(new Vec3(this.getX(), this.getY(), this.getZ())
@@ -208,7 +207,7 @@ public class CaptainCorneliaBoss extends Monster implements IAnimatable, INoHurt
         }
 
         if (this.isInAction())
-            this.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 5, 3, false, false));
+            this.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 5, 3, false, false));
 
         if (this.hasEffect(MobEffects.LEVITATION)) {
             this.heal(2);
@@ -252,7 +251,7 @@ public class CaptainCorneliaBoss extends Monster implements IAnimatable, INoHurt
             serverLevel.sendParticles(ghostShine, getX(), getY() + 2, getZ(), 1, 0.15, 0.1, 0.15, 0.1);
         }
 
-//        if (this.level().isClientSide) {
+//        if (this.level().isClientSide()) {
 //            final Vec3 center = this.position();
 //            this.level().getEntitiesOfClass(Player.class, new AABB(center, center).inflate(32)).forEach(AquamiraeClient::playCorneliaMusic);
 //        }
@@ -307,7 +306,7 @@ public class CaptainCorneliaBoss extends Monster implements IAnimatable, INoHurt
         if (this.level() instanceof ServerLevel level) {
             var pos = this.blockPosition();
             LightningBolt entityToSpawn = new LightningBolt(EntityType.LIGHTNING_BOLT, level);
-            entityToSpawn.moveTo(Vec3.atBottomCenterOf(pos));
+            entityToSpawn.snapTo(Vec3.atBottomCenterOf(pos));
             entityToSpawn.setVisualOnly(true);
             level.addFreshEntity(entityToSpawn);
             level.playSound(null, pos, AquamiraeSounds.ENTITY_CAPTAIN_CORNELIA_HORN, SoundSource.HOSTILE, 3, 1);
@@ -320,14 +319,12 @@ public class CaptainCorneliaBoss extends Monster implements IAnimatable, INoHurt
     }
 
     @Override
-    protected void dropEquipment() {
-        if (level() instanceof ServerLevel server) {
-            if (Math.random() <= 0.2F) {
-                final ItemEntity item = new ItemEntity(EntityType.ITEM, server);
-                item.setItem(getSeasonalWeapon().getDefaultInstance());
-                item.moveTo(position());
-                server.addFreshEntity(item);
-            }
+    protected void dropEquipment(ServerLevel level) {
+        if (Math.random() <= 0.2F) {
+            final ItemEntity item = new ItemEntity(EntityType.ITEM, level);
+            item.setItem(getSeasonalWeapon().getDefaultInstance());
+            item.snapTo(position());
+            level.addFreshEntity(item);
         }
     }
 
@@ -352,7 +349,7 @@ public class CaptainCorneliaBoss extends Monster implements IAnimatable, INoHurt
     }
 
     @Override
-    public boolean hurt(DamageSource source, float amount) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
         if (source.getDirectEntity() instanceof AbstractArrow) return false;
         if (source.is(DamageTypes.FALL)) return false;
         if (source.is(DamageTypes.CACTUS)) return false;
@@ -360,13 +357,13 @@ public class CaptainCorneliaBoss extends Monster implements IAnimatable, INoHurt
         if (source.is(DamageTypes.LIGHTNING_BOLT)) return false;
         if (source.is(DamageTypes.EXPLOSION)) return false;
         if (source.is(DamageTypes.TRIDENT)) return false;
-        return super.hurt(source, amount);
+        return super.hurtServer(level, source, amount);
     }
 
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(
             ServerLevelAccessor level, DifficultyInstance difficulty,
-            MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData
+            EntitySpawnReason spawnType, @Nullable SpawnGroupData spawnGroupData
     ) {
         this.equip(getDefaultWeaponLoadout());
         this.playSound(AquamiraeSounds.ENTITY_CAPTAIN_CORNELIA_HORN, 3, 1);
@@ -388,8 +385,8 @@ public class CaptainCorneliaBoss extends Monster implements IAnimatable, INoHurt
     }
 
     @Override
-    public void customServerAiStep() {
-        super.customServerAiStep();
+    public void customServerAiStep(ServerLevel level) {
+        super.customServerAiStep(level);
         this.bossInfo.setProgress(this.getHealth() / this.getMaxHealth());
     }
 

@@ -7,6 +7,8 @@ import dev.obscuria.aquamirae.registry.AquamiraeCreativeTabs;
 import dev.obscuria.aquamirae.registry.AquamiraeStructureProcessors;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LecternBlock;
@@ -36,8 +38,12 @@ public class LogbookProcessor extends StructureProcessor {
             StructurePlaceSettings settings
     ) {
         if (!relativeBlockInfo.state().is(Blocks.LECTERN)) return relativeBlockInfo;
+        // MC 26.1.2: ItemStack#save(RegistryAccess) is gone; stacks are encoded
+        // through their codec into NBT.
+        var ops = level.registryAccess().createSerializationContext(NbtOps.INSTANCE);
+        var book = ItemStack.CODEC.encodeStart(ops, AquamiraeCreativeTabs.logBook(logbookType)).result().orElseThrow();
         var compoundTag = new CompoundTag();
-        compoundTag.put("Book", AquamiraeCreativeTabs.logBook(logbookType).save(level.registryAccess()));
+        compoundTag.put("Book", book);
         return new StructureTemplate.StructureBlockInfo(
                 relativeBlockInfo.pos(),
                 relativeBlockInfo.state().setValue(LecternBlock.HAS_BOOK, true),

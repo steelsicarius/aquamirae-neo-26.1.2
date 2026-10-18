@@ -2,6 +2,7 @@ package dev.obscuria.aquamirae.common.entity.ai;
 
 import dev.obscuria.aquamirae.registry.AquamiraeSounds;
 import dev.obscuria.aquamirae.common.entity.Anglerfish;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ai.goal.Goal;
 
@@ -78,7 +79,7 @@ public class AnglerfishBiteGoal extends Goal {
     protected void attackTarget() {
         if (anglerfish.getTarget() == null) return;
         if (distanceToTarget() > 2.5) return;
-        this.anglerfish.doHurtTarget(anglerfish.getTarget());
+        if (anglerfish.level() instanceof ServerLevel server) this.anglerfish.doHurtTarget(server, anglerfish.getTarget());
     }
 
     protected double distanceToTarget() {

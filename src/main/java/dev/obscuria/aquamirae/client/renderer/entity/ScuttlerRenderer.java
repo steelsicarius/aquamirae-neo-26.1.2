@@ -7,7 +7,8 @@ import dev.obscuria.aquamirae.Aquamirae;
 import dev.obscuria.aquamirae.client.model.ModelScuttler;
 import dev.obscuria.aquamirae.common.entity.Scuttler;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
@@ -62,7 +63,7 @@ public class ScuttlerRenderer extends GeoEntityRenderer<Scuttler> {
 
         @Override
         protected ItemStack getStackForBone(GeoBone bone, Scuttler animatable) {
-            return SEGMENT_2.equals(bone.getName())
+            return SEGMENT_2.equals(bone.name())
                     ? animatable.getStolenItem()
                     : ItemStack.EMPTY;
         }

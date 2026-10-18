@@ -20,13 +20,12 @@ public final class ShipbreakerSpawner implements CustomSpawner {
     private int cooldown = pickCooldown(RandomSource.create());
 
     @Override
-    public int tick(ServerLevel level, boolean spawnEnemies, boolean spawnFriendlies) {
-        if (!CommonConfig.ENABLE_SHIPBREAKER_SPAWNING.get()) return 0;
-        if (--cooldown > 0) return 0;
+    public void tick(ServerLevel level, boolean spawnEnemies) {
+        if (!CommonConfig.ENABLE_SHIPBREAKER_SPAWNING.get()) return;
+        if (--cooldown > 0) return;
         this.cooldown = trySpawn(level)
                 ? pickCooldown(level.getRandom())
                 : pickRetryDelay(level.getRandom());
-        return 0;
     }
 
     private boolean trySpawn(ServerLevel level) {

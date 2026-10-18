@@ -5,7 +5,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -20,7 +20,7 @@ public class LuminescentBubbleItem extends Item {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         var stack = player.getItemInHand(hand);
         if (level.isWaterAt(player.blockPosition().above())) {
             stack.shrink(1);
@@ -31,8 +31,8 @@ public class LuminescentBubbleItem extends Item {
                         player.blockPosition().above(),
                         SoundEvents.BUBBLE_COLUMN_BUBBLE_POP,
                         SoundSource.BLOCKS, 2, 1);
-            return InteractionResultHolder.success(stack);
+            return InteractionResult.SUCCESS;
         }
-        return InteractionResultHolder.fail(stack);
+        return InteractionResult.FAIL;
     }
 }

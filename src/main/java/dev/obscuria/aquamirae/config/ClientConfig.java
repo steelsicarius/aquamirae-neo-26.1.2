@@ -22,7 +22,7 @@ public final class ClientConfig {
     public static void init() {}
 
     static {
-        var builder = new ConfigBuilder("obscuria/aquamirae-client.toml");
+        var builder = ConfigBuilder.create("obscuria/aquamirae-client.toml");
         builder.comment(
                 "=============[ Aquamirae Client Config ]============",
                 " Please prefer editing the config through the in-game ",

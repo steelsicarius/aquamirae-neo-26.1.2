@@ -4,6 +4,7 @@ import com.google.common.base.Suppliers;
 import dev.obscuria.aquamirae.registry.AquamiraeEntityTypes;
 import dev.obscuria.aquamirae.registry.AquamiraeItems;
 import net.minecraft.core.particles.ItemParticleOption;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -80,7 +81,7 @@ public class AbyssalShard extends AbstractHomingShard {
                 SoundSource.NEUTRAL,
                 1f, 1f);
         level.sendParticles(
-                new ItemParticleOption(ParticleTypes.ITEM, PARTICLE_ITEM.get()),
+                new ItemParticleOption(ParticleTypes.ITEM, ItemStackTemplate.fromNonEmptyStack(PARTICLE_ITEM.get())),
                 this.getX(), this.getY(), this.getZ(),
                 8, 0, 0, 0, 0.15);
         if (getShardScale() > 0.75f) {

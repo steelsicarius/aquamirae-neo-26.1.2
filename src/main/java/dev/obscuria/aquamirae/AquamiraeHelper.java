@@ -3,6 +3,7 @@ package dev.obscuria.aquamirae;
 import dev.obscuria.aquamirae.registry.tags.AquamiraeBiomeTags;
 import dev.obscuria.aquamirae.registry.tags.AquamiraeEntityTypeTags;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -24,12 +25,19 @@ public final class AquamiraeHelper {
         return level.getBiome(pos).is(AquamiraeBiomeTags.ICE_MAZE);
     }
 
+    /**
+     * Replacement for the 1.21.1 {@code Entity#isInWaterOrBubble()} helper, removed in 26.1.2.
+     */
+    public static boolean isInWaterOrBubble(Entity entity) {
+        return entity.isInWater() || entity.level().getBlockState(entity.blockPosition()).is(Blocks.BUBBLE_COLUMN);
+    }
+
     public static boolean isAffectedByDepthsFury(@Nullable Entity entity) {
-        return entity != null && entity.getType().is(AquamiraeEntityTypeTags.AFFECTED_BY_DEPTHS_FURY);
+        return entity != null && entity.is(AquamiraeEntityTypeTags.AFFECTED_BY_DEPTHS_FURY);
     }
 
     public static boolean isAffectedByDepthsResilience(@Nullable Entity entity) {
-        return entity != null && entity.getType().is(AquamiraeEntityTypeTags.AFFECTED_BY_DEPTHS_RESILIENCE);
+        return entity != null && entity.is(AquamiraeEntityTypeTags.AFFECTED_BY_DEPTHS_RESILIENCE);
     }
 
     public static boolean doPoison(LivingEntity attacker, Entity entity, int duration, int amplifier) {

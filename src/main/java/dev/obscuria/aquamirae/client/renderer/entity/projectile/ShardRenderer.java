@@ -4,7 +4,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import dev.obscuria.aquamirae.client.model.ModelShard;
 import dev.obscuria.aquamirae.common.entity.projectile.AbstractShard;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -33,7 +34,7 @@ public abstract class ShardRenderer<T extends AbstractShard> extends EntityRende
                 Mth.lerp(delta, shard.localXRotO, shard.localXRot),
                 Mth.lerp(delta, shard.localYRotO, shard.localYRot));
         this.model.renderToBuffer(pose,
-                source.getBuffer(RenderType.eyes(this.getTextureLocation(shard))),
+                source.getBuffer(RenderTypes.eyes(this.getTextureLocation(shard))),
                 light, OverlayTexture.NO_OVERLAY, CommonColors.WHITE);
         pose.popPose();
     }

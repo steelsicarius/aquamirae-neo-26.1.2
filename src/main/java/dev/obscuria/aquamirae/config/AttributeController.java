@@ -112,7 +112,7 @@ record AttributeController(Option<String> option) implements Controller<String> 
     private static Map<String, String> collectAttributeOptions() {
         Map<String, String> options = new TreeMap<>();
         for (var entry : BuiltInRegistries.ATTRIBUTE.entrySet()) {
-            var location = entry.getKey().location();
+            var location = entry.getKey().identifier();
             var displayName = Component.translatable(entry.getValue().getDescriptionId()).getString();
             var id = "minecraft".equals(location.getNamespace()) ? location.getPath() : location.toString();
             options.put("%s (%s)".formatted(displayName, id), id);
@@ -234,8 +234,8 @@ record AttributeController(Option<String> option) implements Controller<String> 
         }
 
         @Override
-        public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            if (isMouseOver(mouseX, mouseY) && isAvailable()) {
+        public boolean mouseClicked(MouseButtonEvent event, boolean doubled) {
+            if (isMouseOver(event.x(), event.y()) && isAvailable()) {
                 playDownSound();
                 openEditor(screen, control);
                 return true;
@@ -244,8 +244,9 @@ record AttributeController(Option<String> option) implements Controller<String> 
         }
 
         @Override
-        public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        public boolean keyPressed(KeyEvent event) {
             if (!focused) return false;
+            int keyCode = event.key();
             if (keyCode == 257 || keyCode == 335 || keyCode == 32) {
                 openEditor(screen, control);
                 return true;

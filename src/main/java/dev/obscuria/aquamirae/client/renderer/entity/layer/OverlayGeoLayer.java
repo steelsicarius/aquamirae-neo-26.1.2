@@ -4,7 +4,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 import com.geckolib.cache.model.BakedGeoModel;
@@ -27,10 +28,10 @@ public class OverlayGeoLayer<T extends GeoAnimatable> extends GeoRenderLayer<T> 
             RenderType renderType, MultiBufferSource bufferSource, VertexConsumer buffer,
             float partialTick, int packedLight, int packedOverlay
     ) {
-        var overlayRenderType = RenderType.eyes(texture);
+        var overlayRenderType = RenderTypes.eyes(texture);
         getRenderer().reRender(
                 bakedModel, poseStack, bufferSource, animatable, overlayRenderType,
-                bufferSource.getBuffer(overlayRenderType), partialTick, LightTexture.FULL_BRIGHT,
+                bufferSource.getBuffer(overlayRenderType), partialTick, LightCoordsUtil.FULL_BRIGHT,
                 OverlayTexture.NO_OVERLAY, -1);
         bufferSource.getBuffer(renderType);
     }

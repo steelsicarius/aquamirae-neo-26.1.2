@@ -30,7 +30,7 @@ public final class HookJukebox {
 
         var recordItem = jukebox.removeItem(0, 1);
         ShipbreakerEvent.trigger(serverLevel, pos.getCenter());
-        serverLevel.playSound(null, pos, SoundEvents.ITEM_BREAK, SoundSource.BLOCKS, 1f, 1f);
+        serverLevel.playSound(null, pos, SoundEvents.ITEM_BREAK.value(), SoundSource.BLOCKS, 1f, 1f);
         spawnItemParticles(serverLevel, pos, recordItem, 8);
 
         for (var player : serverLevel.getEntitiesOfClass(ServerPlayer.class, new AABB(pos).inflate(256))) {
@@ -42,7 +42,7 @@ public final class HookJukebox {
         for (var i = 0; i < amount; ++i) {
             var motion = new Vec3(level.getRandom().triangle(0, 1f), 0.25f, level.getRandom().triangle(0, 1f));
             var position = pos.getCenter().add(0, 0.55f, 0);
-            level.sendParticles(new ItemParticleOption(ParticleTypes.ITEM, stack),
+            level.sendParticles(new ItemParticleOption(ParticleTypes.ITEM, stack.getItem()),
                     position.x, position.y, position.z, 1,
                     motion.x, motion.y, motion.z, 0);
         }

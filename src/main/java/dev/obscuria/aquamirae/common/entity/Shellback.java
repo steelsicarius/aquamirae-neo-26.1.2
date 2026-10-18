@@ -11,12 +11,13 @@ import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -41,7 +42,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.CollisionContext;
 import org.jetbrains.annotations.Nullable;
 import com.geckolib.animatable.GeoEntity;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -53,7 +53,7 @@ import com.geckolib.util.GeckoLibUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Shellback extends TamableAnimal implements MultipartEntity, GeoEntity, PlayerRideable, Saddleable {
+public class Shellback extends TamableAnimal implements MultipartEntity, GeoEntity, PlayerRideable {
 
     public static final int MAX_SADDLES = 2;
 
@@ -96,7 +96,7 @@ public class Shellback extends TamableAnimal implements MultipartEntity, GeoEnti
         if (getSaddleCount() >= MAX_SADDLES) return false;
         setSaddleCount(getSaddleCount() + 1);
         if (source != null) {
-            this.level().playSound(null, this, SoundEvents.HORSE_SADDLE, source, 1.0F, 1.0F);
+            this.level().playSound(null, this, SoundEvents.HORSE_SADDLE.value(), source, 1.0F, 1.0F);
         }
         return true;
     }
@@ -104,7 +104,7 @@ public class Shellback extends TamableAnimal implements MultipartEntity, GeoEnti
     public boolean removeSaddle() {
         if (getSaddleCount() <= 0) return false;
         setSaddleCount(getSaddleCount() - 1);
-        spawnAtLocation(Items.SADDLE);
+        if (this.level() instanceof ServerLevel server) this.spawnAtLocation(server, Items.SADDLE);
         level().playSound(null, this, SoundEvents.SHEEP_SHEAR, SoundSource.NEUTRAL, 0.8F, 1.0F);
         return true;
     }
@@ -114,17 +114,15 @@ public class Shellback extends TamableAnimal implements MultipartEntity, GeoEnti
         for (int i = 0; i < chestView.getContainerSize(); i++) {
             var stack = chestView.getItem(i);
             if (stack.isEmpty()) continue;
-            this.spawnAtLocation(stack);
+            if (this.level() instanceof ServerLevel server) this.spawnAtLocation(server, stack);
             chestView.setItem(i, ItemStack.EMPTY);
         }
     }
 
-    @Override
     public boolean isSaddleable() {
         return !isBaby();
     }
 
-    @Override
     public void equipSaddle(ItemStack itemStack, @Nullable SoundSource soundSource) {
         addSaddle(soundSource);
     }
@@ -170,10 +168,10 @@ public class Shellback extends TamableAnimal implements MultipartEntity, GeoEnti
             if (!level().isClientSide()) {
                 removeSaddle();
                 if (!player.getAbilities().instabuild) {
-                    stack.hurtAndBreak(1, player, getSlotForHand(hand));
+                    stack.hurtAndBreak(1, player, hand.asEquipmentSlot());
                 }
             }
-            return InteractionResult.sidedSuccess(level().isClientSide());
+            return level().isClientSide() ? InteractionResult.SUCCESS : InteractionResult.SUCCESS_SERVER;
         }
 
         if (stack.is(Items.SADDLE) && getSaddleCount() < MAX_SADDLES) {
@@ -183,12 +181,12 @@ public class Shellback extends TamableAnimal implements MultipartEntity, GeoEnti
                     stack.shrink(1);
                 }
             }
-            return InteractionResult.sidedSuccess(level().isClientSide());
+            return level().isClientSide() ? InteractionResult.SUCCESS : InteractionResult.SUCCESS_SERVER;
         }
 
         if (canAddPassenger(player)) {
             doPlayerRide(player);
-            return InteractionResult.sidedSuccess(level().isClientSide());
+            return level().isClientSide() ? InteractionResult.SUCCESS : InteractionResult.SUCCESS_SERVER;
         }
 
         return super.mobInteract(player, hand);
@@ -266,25 +264,25 @@ public class Shellback extends TamableAnimal implements MultipartEntity, GeoEnti
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag);
-        this.inventory.save(tag, level().registryAccess());
-        tag.putInt("SaddleCount", getSaddleCount());
-        tag.putBoolean("HasChest0", hasChest(0));
-        tag.putBoolean("HasChest1", hasChest(1));
-        tag.putBoolean("HasChest2", hasChest(2));
-        tag.putBoolean("HasChest3", hasChest(3));
+    public void addAdditionalSaveData(ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        this.inventory.save(output);
+        output.putInt("SaddleCount", getSaddleCount());
+        output.putBoolean("HasChest0", hasChest(0));
+        output.putBoolean("HasChest1", hasChest(1));
+        output.putBoolean("HasChest2", hasChest(2));
+        output.putBoolean("HasChest3", hasChest(3));
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag);
-        this.inventory.load(tag, level().registryAccess());
-        this.setSaddleCount(tag.getInt("SaddleCount"));
-        this.setChest(0, tag.getBoolean("HasChest0"));
-        this.setChest(1, tag.getBoolean("HasChest1"));
-        this.setChest(2, tag.getBoolean("HasChest2"));
-        this.setChest(3, tag.getBoolean("HasChest3"));
+    public void readAdditionalSaveData(ValueInput input) {
+        super.readAdditionalSaveData(input);
+        this.inventory.load(input);
+        this.setSaddleCount(input.getIntOr("SaddleCount", 0));
+        this.setChest(0, input.getBooleanOr("HasChest0", false));
+        this.setChest(1, input.getBooleanOr("HasChest1", false));
+        this.setChest(2, input.getBooleanOr("HasChest2", false));
+        this.setChest(3, input.getBooleanOr("HasChest3", false));
     }
 
     @Override
@@ -303,15 +301,15 @@ public class Shellback extends TamableAnimal implements MultipartEntity, GeoEnti
     }
 
     @Override
-    protected void dropEquipment() {
-        super.dropEquipment();
+    protected void dropEquipment(ServerLevel level) {
+        super.dropEquipment(level);
         for (int i = 0; i < 4; i++) {
             if (!hasChest(i)) continue;
             dropChestContents(i);
-            spawnAtLocation(Blocks.CHEST);
+            spawnAtLocation(level, Blocks.CHEST);
         }
         for (int i = 0; i < getSaddleCount(); i++) {
-            spawnAtLocation(Items.SADDLE);
+            spawnAtLocation(level, Items.SADDLE);
         }
     }
 
@@ -336,7 +334,7 @@ public class Shellback extends TamableAnimal implements MultipartEntity, GeoEnti
         double prevZ = this.getZ();
         super.tick();
         floatOnWater();
-        checkInsideBlocks();
+        this.applyEffectsFromBlocks(this.position(), this.position());
         spawnTrailParticles(prevX, prevZ);
         updatePartPositions();
     }
@@ -383,7 +381,7 @@ public class Shellback extends TamableAnimal implements MultipartEntity, GeoEnti
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "Default", 10,
+        controllers.add(new AnimationController<Shellback>("Default", 10,
                 state -> state.setAndContinue(DefaultAnimations.WALK)));
     }
 
@@ -400,14 +398,14 @@ public class Shellback extends TamableAnimal implements MultipartEntity, GeoEnti
     @Override
     public SpawnGroupData finalizeSpawn(
             ServerLevelAccessor level, DifficultyInstance difficulty,
-            MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData
+            EntitySpawnReason spawnType, @Nullable SpawnGroupData spawnGroupData
     ) {
         ConfiguredAttribute.applyAttributes(this, CommonConfig.SHELLBACK_ATTRIBUTES);
         return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
     }
 
     protected void doPlayerRide(Player player) {
-        if (level().isClientSide) return;
+        if (level().isClientSide()) return;
         player.setYRot(this.getYRot());
         player.setXRot(this.getXRot());
         player.startRiding(this);
@@ -498,7 +496,7 @@ public class Shellback extends TamableAnimal implements MultipartEntity, GeoEnti
 
     private void floatOnWater() {
         if (this.isInWater()) {
-            CollisionContext ctx = CollisionContext.of(this);
+            var fluid = this.level().getFluidState(this.blockPosition());
             if (ctx.isAbove(LiquidBlock.STABLE_SHAPE, this.blockPosition(), true)
                     && !this.level().getFluidState(this.blockPosition().above()).is(FluidTags.WATER)) {
                 this.setOnGround(true);

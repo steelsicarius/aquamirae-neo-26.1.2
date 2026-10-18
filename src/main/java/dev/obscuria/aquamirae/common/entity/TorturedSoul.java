@@ -6,6 +6,7 @@ import dev.obscuria.aquamirae.common.entity.animation.IAnimatable;
 import dev.obscuria.aquamirae.config.CommonConfig;
 import dev.obscuria.aquamirae.config.ConfiguredAttribute;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -21,7 +22,7 @@ import net.minecraft.world.entity.monster.illager.AbstractIllager;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.ThrownPotion;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.AbstractThrownPotion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import org.jetbrains.annotations.Nullable;
@@ -73,17 +74,17 @@ public class TorturedSoul extends Monster implements IAnimatable {
     }
 
     @Override
-    public boolean hurt(DamageSource source, float amount) {
-        if (source.getDirectEntity() instanceof ThrownPotion || source.getDirectEntity() instanceof AreaEffectCloud)
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
+        if (source.getDirectEntity() instanceof AbstractThrownPotion || source.getDirectEntity() instanceof AreaEffectCloud)
             return false;
         if (source.is(DamageTypes.DROWN)) return false;
-        return super.hurt(source, amount);
+        return super.hurtServer(level, source, amount);
     }
 
     @Override
-    public boolean doHurtTarget(Entity entity) {
+    public boolean doHurtTarget(ServerLevel level, Entity entity) {
         this.attackState.play(this);
-        return super.doHurtTarget(entity);
+        return super.doHurtTarget(level, entity);
     }
 
     @Override
@@ -95,7 +96,7 @@ public class TorturedSoul extends Monster implements IAnimatable {
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(
             ServerLevelAccessor level, DifficultyInstance difficulty,
-            MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData
+            EntitySpawnReason spawnType, @Nullable SpawnGroupData spawnGroupData
     ) {
         ConfiguredAttribute.applyAttributes(this, CommonConfig.TORTURED_SOUL_ATTRIBUTES);
         return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
@@ -134,7 +135,7 @@ public class TorturedSoul extends Monster implements IAnimatable {
 
     public static boolean checkSpawnRules(
             EntityType<TorturedSoul> type, ServerLevelAccessor levelAccessor,
-            MobSpawnType spawnType, BlockPos pos, RandomSource random
+            EntitySpawnReason spawnType, BlockPos pos, RandomSource random
     ) {
         return Monster.checkMonsterSpawnRules(type, levelAccessor, spawnType, pos, random);
     }

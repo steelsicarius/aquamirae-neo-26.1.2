@@ -2,6 +2,8 @@ package dev.obscuria.aquamirae.common.entity.projectile;
 
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -44,7 +46,7 @@ public abstract class AbstractShard extends Projectile {
         super.tick();
         final var hitResult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity, this.getClipType());
         if (hitResult.getType() != HitResult.Type.MISS) this.onHit(hitResult);
-        this.checkInsideBlocks();
+        this.applyEffectsFromBlocks(this.position(), this.position());
 
         var motion = this.getDeltaMovement();
         final var x = this.getX() + motion.x;
@@ -110,7 +112,7 @@ public abstract class AbstractShard extends Projectile {
     protected void onHitEntity(EntityHitResult result) {
         final var entity = result.getEntity();
         final var owner = this.getOwner() instanceof LivingEntity living ? living : null;
-        if (entity.hurt(this.damageSources().mobProjectile(this, owner), this.getDamage(entity)))
+        if (entity.hurtOrSimulate(this.damageSources().mobProjectile(this, owner), this.getDamage(entity)))
             this.doPostHurtEffects(result);
         this.doBreak();
     }
@@ -126,15 +128,15 @@ public abstract class AbstractShard extends Projectile {
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag);
-        tag.putFloat("Scale", this.entityData.get(SCALE));
+    protected void addAdditionalSaveData(ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putFloat("Scale", this.entityData.get(SCALE));
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag);
-        this.entityData.set(SCALE, tag.getFloat("Scale"));
+    protected void readAdditionalSaveData(ValueInput input) {
+        super.readAdditionalSaveData(input);
+        this.entityData.set(SCALE, input.getFloatOr("Scale", 1f));
     }
 
     @SuppressWarnings("SuspiciousNameCombination")

@@ -21,6 +21,7 @@ import dev.obscuria.aquamirae.registry.AquamiraeDataComponents;
 import dev.obscuria.aquamirae.registry.AquamiraeEntityTypes;
 import dev.obscuria.aquamirae.registry.AquamiraeParticleTypes;
 import dev.obscuria.fragmentum.v2.api.client.FragmentumClientRegistry;
+import dev.obscuria.fragmentum.v2.api.client.TooltipComponentRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.CubeMap;
 import net.minecraft.client.renderer.PanoramaRenderer;
@@ -45,7 +46,7 @@ public final class AquamiraeClient {
     public static final Identifier PIRATE_VINDICATOR_TEXTURE;
 
     public static float partialTicks() {
-        return Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false);
+        return Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
     }
 
     public static void animateCritEffect(Entity entity) {
@@ -66,10 +67,10 @@ public final class AquamiraeClient {
         ClientConfig.init();
         var registrar = FragmentumClientRegistry.registrar(Aquamirae.MOD_ID);
 
-        FragmentumClientRegistry.registerTooltipComponent(AbilitySetTooltip.class, ClientAbilitySetTooltip::create);
-        FragmentumClientRegistry.registerTooltipComponent(RuneDamage.class, ClientRuneTooltip::create);
-        FragmentumClientRegistry.registerTooltipComponent(RuneProtection.class, ClientRuneTooltip::create);
-        FragmentumClientRegistry.registerTooltipComponent(Keepsake.class, ClientKeepsakeTooltip::create);
+        TooltipComponentRegistry.register(AbilitySetTooltip.class, ClientAbilitySetTooltip::create);
+        TooltipComponentRegistry.register(RuneDamage.class, ClientRuneTooltip::create);
+        TooltipComponentRegistry.register(RuneProtection.class, ClientRuneTooltip::create);
+        TooltipComponentRegistry.register(Keepsake.class, ClientKeepsakeTooltip::create);
 
         registrar.registerModelLayer(AquamiraeModelLayers.ABYSSAL_SCYPHOID, ModelAbyssalScyphoid::createBodyLayer);
         registrar.registerModelLayer(AquamiraeModelLayers.SPINEFISH, ModelSpinefish::createBodyLayer);

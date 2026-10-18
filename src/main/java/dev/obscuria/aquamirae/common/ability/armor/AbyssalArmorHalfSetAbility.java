@@ -33,11 +33,11 @@ public final class AbyssalArmorHalfSetAbility extends SimpleAbility implements I
         if (instance.getEffect().value().getCategory() != MobEffectCategory.HARMFUL) return;
         var duration = Math.round(20 * computeVariable(VAR_DURATION, entity));
         var amplifier = selectAmplifier(entity);
-        entity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, duration, amplifier));
+        entity.addEffect(new MobEffectInstance(MobEffects.STRENGTH, duration, amplifier));
     }
 
     private int selectAmplifier(LivingEntity entity) {
-        @Nullable var current = entity.getEffect(MobEffects.DAMAGE_BOOST);
+        @Nullable var current = entity.getEffect(MobEffects.STRENGTH);
         var maxStacks = Math.round(computeVariable(VAR_MAX_STACKS, entity));
         return Math.min(maxStacks, current == null ? 0 : current.getAmplifier() + 1);
     }

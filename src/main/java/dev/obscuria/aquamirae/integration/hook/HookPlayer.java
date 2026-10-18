@@ -34,8 +34,8 @@ public final class HookPlayer {
             player.setAirSupply(280);
             player.playSound(AquamiraeSounds.EVENT_AIR_SUPPLY);
         } else {
-            if (player.level().isClientSide || player.isCreative() || player.isSpectator()) return;
-            if (!player.isInWaterOrBubble()) return;
+            if (player.level().isClientSide() || player.isCreative() || player.isSpectator()) return;
+            if (!AquamiraeHelper.isInWaterOrBubble(player)) return;
             if (player.getVehicle() != null) return;
             if (player.getTicksFrozen() > player.getTicksRequiredToFreeze() * 3) return;
             if (!AquamiraeHelper.isInIceMaze(player)) return;
@@ -44,11 +44,11 @@ public final class HookPlayer {
     }
 
     private static void tickIceMazeAmbience(Player player) {
-        if (player.level().isClientSide
+        if (player.level().isClientSide()
                 && AquamiraeHelper.isInIceMaze(player)
-                && player.level().random.nextFloat() < 0.01f
-                && player.level().random.nextFloat() < 0.05f) {
-            var pos = selectAmbientSoundPos(player.level().random);
+                && player.level().getRandom().nextFloat() < 0.01f
+                && player.level().getRandom().nextFloat() < 0.05f) {
+            var pos = selectAmbientSoundPos(player.level().getRandom());
             AquamiraeClient.playRelativeSound(AquamiraeSounds.AMBIENT_SHIP_HORN, pos, 1f, 1f);
         }
     }

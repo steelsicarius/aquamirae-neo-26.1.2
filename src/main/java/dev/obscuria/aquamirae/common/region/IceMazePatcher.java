@@ -9,8 +9,8 @@ import dev.obscuria.aquamirae.server.spawner.AquamiraeSpawnData;
 import dev.obscuria.aquamirae.server.spawner.BiomeSpawnerMode;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.attribute.AmbientParticle;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.level.biome.AmbientParticleSettings;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.GenerationStep;
 
@@ -22,7 +22,7 @@ public final class IceMazePatcher {
 
     public static void patch(BiomePatcher patcher) {
 
-        patcher.addCarver(GenerationStep.Carving.AIR, AquamiraeConfiguredCarvers.CANYON);
+        patcher.addCarver(AquamiraeConfiguredCarvers.CANYON);
 
         patcher.addFeature(GenerationStep.Decoration.RAW_GENERATION, AquamiraePlacedFeatures.SURFACE_ICE_WALLS);
         patcher.addFeature(GenerationStep.Decoration.RAW_GENERATION, AquamiraePlacedFeatures.SURFACE_CRACKED_ICE);
@@ -43,7 +43,7 @@ public final class IceMazePatcher {
         patcher.setTemperature(-1);
         patcher.setTemperatureModifier(Biome.TemperatureModifier.NONE);
 
-        patcher.setAmbientParticle(new AmbientParticleSettings(ParticleTypes.WHITE_ASH, 0.05f));
+        patcher.setAmbientParticle(new AmbientParticle(ParticleTypes.WHITE_ASH, 0.05f));
         patcher.setAmbientLoop(AquamiraeSounds.AMBIENT_ICE_MAZE_LOOP.holder());
         patcher.setFogColor(12638463);
         patcher.setSkyColor(8364543);

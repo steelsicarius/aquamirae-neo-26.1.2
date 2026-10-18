@@ -12,20 +12,21 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.MapColor;
@@ -38,7 +39,7 @@ import java.util.Objects;
 @SuppressWarnings("deprecation")
 public class FrozenChestBlock extends Block implements SimpleWaterloggedBlock {
 
-    public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
+    public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     private static final VoxelShape SHAPE = box(0.9, 0, 0.9, 15.1, 14.1, 15.1);
 
@@ -54,7 +55,7 @@ public class FrozenChestBlock extends Block implements SimpleWaterloggedBlock {
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(
+    protected InteractionResult useItemOn(
             ItemStack stack, BlockState state, Level level, BlockPos pos,
             Player player, InteractionHand hand, BlockHitResult hitResult
     ) {
@@ -63,9 +64,8 @@ public class FrozenChestBlock extends Block implements SimpleWaterloggedBlock {
             var chest = Blocks.CHEST.defaultBlockState().setValue(FACING, state.getValue(FACING));
             level.setBlock(pos, chest, 3);
             if (level.getBlockEntity(pos) instanceof RandomizableContainerBlockEntity container) {
-                container.setLootTable(
-                        ResourceKey.create(Registries.LOOT_TABLE, Aquamirae.id("chests/frozen_chest")),
-                        player.getRandom().nextInt());
+                container.setLootTable(ResourceKey.create(Registries.LOOT_TABLE, Aquamirae.id("chests/frozen_chest")));
+                container.setLootTableSeed(player.getRandom().nextLong());
             }
             level.playSound(player, pos, AquamiraeSounds.BLOCK_FROZEN_CHEST_UNLOCK, SoundSource.BLOCKS, 1f, 1f);
             for (int i = 0; i < 12; ++i) {
@@ -81,9 +81,9 @@ public class FrozenChestBlock extends Block implements SimpleWaterloggedBlock {
                 var type = Objects.requireNonNull(AquamiraeParticleTypes.SHINE.simple());
                 level.addParticle(type, d0, d1, d2, 0, 0.05, 0);
             }
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
-        return ItemInteractionResult.FAIL;
+        return InteractionResult.FAIL;
     }
 
     @Override
@@ -114,11 +114,10 @@ public class FrozenChestBlock extends Block implements SimpleWaterloggedBlock {
 
     @Override
     public BlockState updateShape(
-            BlockState state, Direction facing, BlockState facingState,
-            LevelAccessor level, BlockPos currentPos, BlockPos facingPos
+            BlockState state, LevelReader level, ScheduledTickAccess ticks,
+            BlockPos currentPos, Direction facing, BlockPos facingPos, BlockState facingState, RandomSource random
     ) {
-        if (state.getValue(WATERLOGGED)) level.scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
-        return super.updateShape(state, facing, facingState, level, currentPos, facingPos);
+if (state.getValue(WATERLOGGED)) ticks.scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(level));        return super.updateShape(state, level, ticks, currentPos, facing, facingPos, facingState, random);
     }
 
     @Override

@@ -7,7 +7,8 @@ import dev.obscuria.aquamirae.client.model.AquamiraeModelLayers;
 import dev.obscuria.aquamirae.client.model.ModelShellbackSaddle;
 import dev.obscuria.aquamirae.common.entity.Shellback;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.Identifier;
 import com.geckolib.cache.model.GeoBone;
@@ -40,7 +41,7 @@ public class ShellbackSaddleLayer<T extends Shellback> extends GeoRenderLayer<T>
             MultiBufferSource bufferSource, VertexConsumer buffer, float partialTick,
             int packedLight, int packedOverlay
     ) {
-        if (!bone.getName().equals(boneName)) return;
+        if (!bone.name().equals(boneName)) return;
         if (animatable.getSaddleCount() < requiredAmount) return;
 
         poseStack.pushPose();

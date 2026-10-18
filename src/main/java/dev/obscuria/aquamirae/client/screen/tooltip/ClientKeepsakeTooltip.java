@@ -1,8 +1,8 @@
 package dev.obscuria.aquamirae.client.screen.tooltip;
 
 import dev.obscuria.aquamirae.common.component.Keepsake;
-import dev.obscuria.fragmentum.content.util.color.Colors;
-import dev.obscuria.fragmentum.content.util.color.HSV;
+import dev.obscuria.fragmentum.v2.api.common.Color;
+import dev.obscuria.fragmentum.v2.api.common.Color;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;

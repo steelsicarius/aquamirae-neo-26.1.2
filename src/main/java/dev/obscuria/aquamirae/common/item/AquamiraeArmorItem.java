@@ -1,8 +1,8 @@
 package dev.obscuria.aquamirae.common.item;
 
-import com.google.common.base.Suppliers;
 import dev.obscuria.aquamirae.Aquamirae;
 import dev.obscuria.aquamirae.client.renderer.AquamiraeArmorRendererProvider;
+import dev.obscuria.aquamirae.registry.AquamiraeAttributes;
 import dev.obscuria.fragmentum.v2.api.common.registry.Deferred;
 import dev.obscuria.fragmentum.v2.api.common.registry.DeferredAttribute;
 import net.minecraft.core.Holder;
@@ -10,9 +10,10 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
+import net.minecraft.world.item.equipment.ArmorMaterial;
+import net.minecraft.world.item.equipment.ArmorType;
 import com.geckolib.animatable.GeoItem;
 import com.geckolib.animatable.client.GeoRenderProvider;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -23,28 +24,44 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class AquamiraeArmorItem extends ArmorItem implements GeoItem {
+/**
+ * MC 26.1.2: {@code ArmorItem} is gone; armor is a plain {@link Item} whose
+ * properties are configured through {@code Item.Properties#humanoidArmor}.
+ * The custom attribute modifiers are merged on top of the material's own
+ * attribute set (replacing the old {@code defaultModifiers} override).
+ */
+public class AquamiraeArmorItem extends Item implements GeoItem {
 
     protected final AnimatableInstanceCache cache;
     protected final boolean glowing;
+    protected final ArmorType type;
 
     public AquamiraeArmorItem(
-            boolean glowing, Deferred<ArmorMaterial> material,
-            Type type, AttributeBuilder builder, Properties properties
+            boolean glowing, ArmorMaterial material,
+            ArmorType type, AttributeBuilder builder, Properties properties
     ) {
-        super(material.holder(), type, properties.stacksTo(1));
+        super(configure(glowing, material, type, builder, properties));
         this.cache = GeckoLibUtil.createInstanceCache(this);
         this.glowing = glowing;
-        var superDefaultModifiers = super.defaultModifiers;
-        this.defaultModifiers = Suppliers.memoize(() -> {
-            var modifierId = Aquamirae.id("armor." + type.getName());
-            var equipmentSlotGroup = EquipmentSlotGroup.bySlot(type.getSlot());
-            return builder.build(superDefaultModifiers.get(), modifierId, equipmentSlotGroup);
-        });
+        this.type = type;
+    }
+
+    private static Properties configure(
+            boolean glowing, ArmorMaterial material, ArmorType type,
+            AttributeBuilder builder, Properties properties
+    ) {
+        var modifierId = Aquamirae.id("armor." + type.getName());
+        var equipmentSlotGroup = EquipmentSlotGroup.bySlot(type.getSlot());
+        var attributes = builder.build(material.createAttributes(type), modifierId, equipmentSlotGroup);
+        return properties.stacksTo(1).humanoidArmor(material, type).attributes(attributes);
     }
 
     public boolean hasGlowingLayer() {
         return glowing;
+    }
+
+    public ArmorType getType() {
+        return this.type;
     }
 
     @Override

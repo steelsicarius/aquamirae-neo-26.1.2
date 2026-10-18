@@ -7,7 +7,8 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 
@@ -31,7 +32,7 @@ public class ModelShipbreakerHead extends BodyDecoration {
 	private final ModelPart bone8;
 
 	public ModelShipbreakerHead(ModelPart root) {
-        super(root, RenderType::entityCutoutNoCull);
+        super(root, RenderTypes::entityCutoutNoCull);
         this.bone = root.getChild("bone");
 		this.bone2 = this.bone.getChild("bone2");
 		this.jaw1 = this.bone.getChild("jaw1");

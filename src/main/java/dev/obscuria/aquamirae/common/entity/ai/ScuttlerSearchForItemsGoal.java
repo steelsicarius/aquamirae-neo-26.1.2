@@ -2,6 +2,7 @@ package dev.obscuria.aquamirae.common.entity.ai;
 
 import dev.obscuria.aquamirae.common.entity.Scuttler;
 import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.entity.item.ItemEntity;
 
 import java.util.EnumSet;
@@ -50,7 +51,7 @@ public class ScuttlerSearchForItemsGoal extends Goal {
         return scuttler.level()
                 .getEntitiesOfClass(ItemEntity.class, area)
                 .stream()
-                .filter(item -> !item.isInWaterOrBubble())
+                .filter(item -> !(item.isInWater() || item.level().getBlockState(item.blockPosition()).is(Blocks.BUBBLE_COLUMN)))
                 .toList();
     }
 }

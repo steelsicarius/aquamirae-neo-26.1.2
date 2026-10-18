@@ -2,12 +2,12 @@ package dev.obscuria.aquamirae.common.entity.inventory;
 
 import dev.obscuria.aquamirae.common.entity.Shellback;
 import dev.obscuria.aquamirae.common.entity.ShellbackChestPart;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
@@ -87,13 +87,13 @@ public class ShellbackInventory implements Container {
     @Override
     public void setChanged() {}
 
-    public void save(CompoundTag tag, HolderLookup.Provider provider) {
-        ContainerHelper.saveAllItems(tag, items, provider);
+    public void save(ValueOutput output) {
+        ContainerHelper.saveAllItems(output, items);
     }
 
-    public void load(CompoundTag tag, HolderLookup.Provider provider) {
+    public void load(ValueInput input) {
         clearContent();
-        ContainerHelper.loadAllItems(tag, items, provider);
+        ContainerHelper.loadAllItems(input, items);
     }
 
     protected class ChestSlice implements Container {

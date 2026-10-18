@@ -13,7 +13,7 @@ public final class AquamiraeRegistries {
 
     static final Registrar REGISTRAR = FragmentumRegistry.registrar(Aquamirae.MOD_ID);
 
-    public static final Registry<AbilitySet> ABILITY_SET = REGISTRAR.createVanillaRegistry(Key.ABILITY_SET);
+    public static final Registry<AbilitySet> ABILITY_SET = REGISTRAR.createRegistry(Key.ABILITY_SET);
 
     public static final class Key {
 

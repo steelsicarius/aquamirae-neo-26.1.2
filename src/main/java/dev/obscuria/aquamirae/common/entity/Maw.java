@@ -9,6 +9,8 @@ import dev.obscuria.aquamirae.config.ConfiguredAttribute;
 import dev.obscuria.aquamirae.registry.AquamiraeSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -82,15 +84,15 @@ public class Maw extends Monster implements IAnimatable {
     }
 
     @Override
-    public boolean doHurtTarget(Entity entity) {
+    public boolean doHurtTarget(ServerLevel level, Entity entity) {
         this.attackState.play(this);
-        return super.doHurtTarget(entity);
+        return super.doHurtTarget(level, entity);
     }
 
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(
             ServerLevelAccessor level, DifficultyInstance difficulty,
-            MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData
+            EntitySpawnReason spawnType, @Nullable SpawnGroupData spawnGroupData
     ) {
         generateMouthItem(level);
         ConfiguredAttribute.applyAttributes(this, CommonConfig.MAW_ATTRIBUTES);
@@ -98,16 +100,15 @@ public class Maw extends Monster implements IAnimatable {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
-        super.addAdditionalSaveData(compound);
-        compound.put(TAG_MOUTH_ITEM, getMouthItem().saveOptional(level().registryAccess()));
+    public void addAdditionalSaveData(ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.store(TAG_MOUTH_ITEM, ItemStack.OPTIONAL_CODEC, getMouthItem());
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
-        super.readAdditionalSaveData(compound);
-        if (compound.contains(TAG_MOUTH_ITEM, CompoundTag.TAG_COMPOUND))
-            setMouthItem(ItemStack.parseOptional(level().registryAccess(), compound.getCompound(TAG_MOUTH_ITEM)));
+    public void readAdditionalSaveData(ValueInput input) {
+        super.readAdditionalSaveData(input);
+        setMouthItem(input.read(TAG_MOUTH_ITEM, ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY));
     }
 
     @Override
@@ -134,11 +135,11 @@ public class Maw extends Monster implements IAnimatable {
     }
 
     @Override
-    protected void dropEquipment() {
-        super.dropEquipment();
+    protected void dropEquipment(ServerLevel level) {
+        super.dropEquipment(level);
         var mouthItem = getMouthItem();
         if (mouthItem.isEmpty()) return;
-        spawnAtLocation(mouthItem);
+        spawnAtLocation(level, mouthItem);
         setMouthItem(ItemStack.EMPTY);
     }
 
@@ -178,7 +179,7 @@ public class Maw extends Monster implements IAnimatable {
     @SuppressWarnings("deprecation")
     public static boolean checkSpawnRules(
             EntityType<Maw> type, ServerLevelAccessor levelAccessor,
-            MobSpawnType spawnType, BlockPos pos, RandomSource random
+            EntitySpawnReason spawnType, BlockPos pos, RandomSource random
     ) {
         return checkAnyLightMonsterSpawnRules(type, levelAccessor, spawnType, pos, random)
                 && pos.getY() > levelAccessor.getSeaLevel() - 4

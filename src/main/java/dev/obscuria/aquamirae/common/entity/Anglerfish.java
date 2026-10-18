@@ -63,8 +63,8 @@ public class Anglerfish extends Monster implements IAnimatable {
     }
 
     @Override
-    public boolean doHurtTarget(Entity entity) {
-        if (!super.doHurtTarget(entity)) return false;
+    public boolean doHurtTarget(ServerLevel level, Entity entity) {
+        if (!super.doHurtTarget(level, entity)) return false;
         AquamiraeHelper.doPoison(this, entity, 200, 0);
         return true;
     }
@@ -94,7 +94,7 @@ public class Anglerfish extends Monster implements IAnimatable {
 
     @Override
     public void travel(Vec3 travelVector) {
-        if (isControlledByLocalInstance() && isInWater()) {
+        if (canSimulateMovement() && isInWater()) {
             moveRelative(0.1F, travelVector);
             move(MoverType.SELF, getDeltaMovement());
             setDeltaMovement(getDeltaMovement().scale(0.9));
@@ -119,15 +119,15 @@ public class Anglerfish extends Monster implements IAnimatable {
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(
             ServerLevelAccessor level, DifficultyInstance difficulty,
-            MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData
+            EntitySpawnReason spawnType, @Nullable SpawnGroupData spawnGroupData
     ) {
         ConfiguredAttribute.applyAttributes(this, CommonConfig.ANGLERFISH_ATTRIBUTES);
         if (CommonConfig.ENABLE_MAZE_MOTHER_SPAWNING.get()
                 && level instanceof ServerLevel serverLevel
-                && spawnType == MobSpawnType.NATURAL
+                && spawnType == EntitySpawnReason.NATURAL
                 && random.nextDouble() < CommonConfig.MAZE_MOTHER_SPAWN_CHANCE.get()) {
             var mazeMother = new MazeMother(AquamiraeEntityTypes.MAZE_MOTHER.get(), serverLevel);
-            mazeMother.moveTo(position());
+            mazeMother.snapTo(position());
             mazeMother.finalizeSpawn(level, difficulty, spawnType, null);
             serverLevel.addFreshEntity(mazeMother);
         }
@@ -175,7 +175,7 @@ public class Anglerfish extends Monster implements IAnimatable {
     @SuppressWarnings("deprecation")
     public static boolean checkSpawnRules(
             EntityType<Anglerfish> type, ServerLevelAccessor levelAccessor,
-            MobSpawnType spawnType, BlockPos pos, RandomSource random
+            EntitySpawnReason spawnType, BlockPos pos, RandomSource random
     ) {
         return levelAccessor.getSeaLevel() - pos.getY() < 32
                 && levelAccessor.getFluidState(pos).is(FluidTags.WATER)

@@ -6,6 +6,7 @@ import dev.obscuria.fragmentum.v2.api.common.network.FragmentumNetworking;
 import lombok.Getter;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 
 public final class AnimState {
@@ -32,14 +33,14 @@ public final class AnimState {
         if (entity.level().isClientSide()) return;
         localPlay(startTick, duration);
         var payload = new ClientboundAnimationPlayPayload(entity.getId(), name, startTick, duration);
-        FragmentumNetworking.sendToAllTracking(entity, payload);
+        FragmentumNetworking.sendToAllTracking((ServerLevel) entity.level(), entity.blockPosition(), payload);
     }
 
     public void stop(Entity entity) {
         if (entity.level().isClientSide()) return;
         localStop();
         var payload = new ClientboundAnimationStopPayload(entity.getId(), name);
-        FragmentumNetworking.sendToAllTracking(entity, payload);
+        FragmentumNetworking.sendToAllTracking((ServerLevel) entity.level(), entity.blockPosition(), payload);
     }
 
     public void localPlay(int startTick, int duration) {

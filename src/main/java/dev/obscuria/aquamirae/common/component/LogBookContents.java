@@ -3,6 +3,7 @@ package dev.obscuria.aquamirae.common.component;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -10,6 +11,7 @@ import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.component.TooltipProvider;
 
 import java.util.function.Consumer;
@@ -21,7 +23,7 @@ public record LogBookContents(Component topic, Component content) implements Too
     public static final LogBookContents EMPTY;
 
     @Override
-    public void addToTooltip(Item.TooltipContext context, Consumer<Component> consumer, TooltipFlag isAdvanced) {
+    public void addToTooltip(Item.TooltipContext context, Consumer<Component> consumer, TooltipFlag isAdvanced, DataComponentGetter getter) {
         consumer.accept(topic.copy().withStyle(ChatFormatting.GRAY));
     }
 

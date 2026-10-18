@@ -26,7 +26,7 @@ public final class TestCommand {
             Commands.CommandSelection selection
     ) {
         dispatcher.register(Commands.literal(Aquamirae.MOD_ID)
-                .requires(source -> source.hasPermission(3))
+                .requires(Commands.hasPermission(Commands.LEVEL_ADMINS))
                 .then(Commands.literal("test")
                         .then(Commands.literal("earthquake")
                                 .then(Commands.argument("target", EntityArgument.player())

@@ -91,7 +91,7 @@ public final class CommonConfig {
     public static void init() {}
 
     static {
-        var builder = new ConfigBuilder("obscuria/aquamirae-common.toml");
+        var builder = ConfigBuilder.create("obscuria/aquamirae-common.toml");
         builder.comment(
                 "=============[ Aquamirae Common Config ]============",
                 " Please prefer editing the config through the in-game ",

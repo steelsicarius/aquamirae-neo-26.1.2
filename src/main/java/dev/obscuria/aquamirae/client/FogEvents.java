@@ -1,6 +1,5 @@
 package dev.obscuria.aquamirae.client;
 
-import com.mojang.blaze3d.shaders.FogShape;
 import dev.obscuria.aquamirae.config.ClientConfig;
 import dev.obscuria.aquamirae.registry.tags.AquamiraeBiomeTags;
 import net.minecraft.client.Camera;
@@ -14,14 +13,13 @@ public final class FogEvents {
 
     @Nullable public static FogColorCallback SET_COLOR = null;
     @Nullable public static FogDistanceCallback SET_DISTANCE =
-            ((camera, fogType, fogMode, farPlane, partialTicks, start, end, shape) -> {
+            ((camera, fogType, fogMode, farPlane, partialTicks, start, end) -> {
                 var level = camera.getEntity().level();
                 if (!level.isRaining()) return null;
                 if (!level.getBiome(camera.getBlockPosition()).is(AquamiraeBiomeTags.HAS_BLIZZARD)) return null;
                 return FogDistanceResult.of(
                         ClientConfig.BLIZZARD_FOG_START.get().floatValue(),
-                        ClientConfig.BLIZZARD_FOG_END.get().floatValue(),
-                        shape);
+                        ClientConfig.BLIZZARD_FOG_END.get().floatValue());
             });
 
     @FunctionalInterface
@@ -48,8 +46,7 @@ public final class FogEvents {
                 FogMode fogMode,
                 float farPlane,
                 float partialTicks,
-                float start, float end,
-                FogShape shape
+                float start, float end
         );
     }
 
@@ -78,22 +75,19 @@ public final class FogEvents {
     public static final class FogDistanceResult {
 
         public float start, end;
-        public FogShape shape;
 
-        private FogDistanceResult(float start, float end, FogShape shape) {
+        private FogDistanceResult(float start, float end) {
             this.start = start;
             this.end = end;
-            this.shape = shape;
         }
 
-        public static FogDistanceResult of(float start, float end, FogShape shape) {
-            return new FogDistanceResult(start, end, shape);
+        public static FogDistanceResult of(float start, float end) {
+            return new FogDistanceResult(start, end);
         }
 
-        public FogDistanceResult set(float start, float end, FogShape shape) {
+        public FogDistanceResult set(float start, float end) {
             this.start = start;
             this.end = end;
-            this.shape = shape;
             return this;
         }
     }

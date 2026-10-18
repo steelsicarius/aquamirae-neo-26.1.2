@@ -4,13 +4,14 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.obscuria.aquamirae.Aquamirae;
 import dev.obscuria.aquamirae.common.SplineBody;
-import dev.obscuria.fragmentum.content.util.color.ARGB;
-import dev.obscuria.fragmentum.content.util.color.Colors;
+import dev.obscuria.fragmentum.v2.api.common.Color;
+import dev.obscuria.fragmentum.v2.api.common.Color;
 import dev.obscuria.fragmentum.v2.api.common.Easing;
 import dev.obscuria.fragmentum.v2.api.common.EasingFunction;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
@@ -120,9 +121,9 @@ public abstract class SplineBodyRenderer<T extends SplineBody, D extends BodyDec
         Matrix4f transform = pose.last().pose();
         int light1 = Math.max(MIN_LIGHT, packedLightAt(level, first.getPosition()));
         int light2 = Math.max(MIN_LIGHT, packedLightAt(level, second.getPosition()));
-        ARGB white = Colors.argbOf(0xFFFFFFFF);
+        ARGB white = Color.components(0xFFFFFFFF);
 
-        VertexConsumer baseConsumer = buffer.getBuffer(RenderType.entitySolid(bodyTexture));
+        VertexConsumer baseConsumer = buffer.getBuffer(RenderTypes.entitySolid(bodyTexture));
         emitTubeQuads(body, first, second, baseConsumer, transform,
                 packedOverlay, light1, light2, bodyTextureRepeat, white);
 
@@ -131,7 +132,7 @@ public abstract class SplineBodyRenderer<T extends SplineBody, D extends BodyDec
         }
 
         for (BodyRenderLayer layer : renderLayers) {
-            ARGB layerColor = Colors.argbOf(layer.getColor());
+            ARGB layerColor = Color.components(layer.getColor());
             float layerRepeat = layer.getTextureRepeat();
             VertexConsumer layerConsumer = buffer.getBuffer(layer.getRenderType(layer.getTexture()));
             emitTubeQuads(body, first, second, layerConsumer, transform,
@@ -144,7 +145,7 @@ public abstract class SplineBodyRenderer<T extends SplineBody, D extends BodyDec
             Matrix4f transform, MultiBufferSource buffer,
             int overlay, int light1, int light2, ARGB color
     ) {
-        var crestConsumer = buffer.getBuffer(RenderType.entityCutoutNoCull(crestVisual.texture()));
+        var crestConsumer = buffer.getBuffer(RenderTypes.entityCutoutNoCull(crestVisual.texture()));
         emitCrestQuad(first, second, true, crestConsumer, transform, overlay, light1, light2, bodyTextureRepeat, color);
         emitCrestQuad(first, second, false, crestConsumer, transform, overlay, light1, light2, bodyTextureRepeat, color);
     }

@@ -4,8 +4,8 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import dev.obscuria.aquamirae.Aquamirae;
-import dev.obscuria.fragmentum.content.util.color.ARGB;
-import dev.obscuria.fragmentum.content.util.color.Colors;
+import dev.obscuria.fragmentum.v2.api.common.Color;
+import dev.obscuria.fragmentum.v2.api.common.Color;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.GameRenderer;
@@ -33,7 +33,7 @@ public final class BlizzardVortexRenderer {
     private static final float MAIN_ALPHA = 0.33f;
     private static final float SEC_ALPHA = 0.14f;
 
-    public static final ARGB COLOR = Colors.argbOf(1f, 0.78f, 0.89f, 1.00f);
+    public static final ARGB COLOR = Color.components(1f, 0.78f, 0.89f, 1.00f);
 
     private static final float FADE_SEC = 5f;
 

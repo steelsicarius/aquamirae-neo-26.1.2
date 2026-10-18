@@ -3,7 +3,7 @@ package dev.obscuria.aquamirae.registry;
 import dev.obscuria.aquamirae.Aquamirae;
 import dev.obscuria.aquamirae.common.advancement.ShipbreakerEncounterTrigger;
 import dev.obscuria.aquamirae.common.advancement.ShipbreakerSurvivalTrigger;
-import net.minecraft.advancement.CriterionTrigger;
+import net.minecraft.advancements.CriterionTrigger;
 import net.minecraft.core.registries.Registries;
 
 public final class AquamiraeCriteriaTriggers {

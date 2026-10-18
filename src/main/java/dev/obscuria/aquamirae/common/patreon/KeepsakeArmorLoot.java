@@ -6,7 +6,6 @@ import dev.obscuria.aquamirae.registry.AquamiraeLootPoolEntries;
 import net.minecraft.util.Unit;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.world.level.storage.loot.entries.LootPoolEntryType;
 import net.minecraft.world.level.storage.loot.entries.LootPoolSingletonContainer;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
@@ -32,8 +31,8 @@ public class KeepsakeArmorLoot extends LootPoolSingletonContainer {
     }
 
     @Override
-    public LootPoolEntryType getType() {
-        return AquamiraeLootPoolEntries.KEEPSAKE_ARMOR;
+    public MapCodec<? extends LootPoolSingletonContainer> codec() {
+        return CODEC;
     }
 
     private Unit unit() {

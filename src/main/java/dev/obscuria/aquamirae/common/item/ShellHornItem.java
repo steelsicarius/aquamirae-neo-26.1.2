@@ -14,8 +14,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -34,15 +34,15 @@ public class ShellHornItem extends Item {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         var stack = player.getItemInHand(hand);
-        if (!(player.level() instanceof ServerLevel serverLevel)) return InteractionResultHolder.success(stack);
+        if (!(player.level() instanceof ServerLevel serverLevel)) return InteractionResult.SUCCESS;
         serverLevel.playSound(null, player.blockPosition().above(), AquamiraeSounds.ITEM_SHELL_HORN_USE, SoundSource.PLAYERS, 3, 1);
-        player.getCooldowns().addCooldown(stack.getItem(), 20 * CommonConfig.SHELL_HORN_COOLDOWN.get());
+        player.getCooldowns().addCooldown(stack, 20 * CommonConfig.SHELL_HORN_COOLDOWN.get());
         @Nullable var summonAt = findValidSummonPos(serverLevel, player);
         if (!player.getAbilities().instabuild && summonAt != null) stack.shrink(1);
         ServerLevelHelper.triggerEvent(serverLevel, new SummonEvent(player, summonAt));
-        return InteractionResultHolder.consume(stack);
+        return InteractionResult.CONSUME;
     }
 
     private static @Nullable BlockPos findValidSummonPos(ServerLevel level, Player player) {
@@ -104,10 +104,10 @@ public class ShellHornItem extends Item {
                 if (summonAt == null) {
                     summoner.sendSystemMessage(FEEDBACK_NOTHING_HAPPENED.copy().withStyle(ChatFormatting.RED));
                 } else {
-                    var difficulty = summoner.level().getCurrentDifficultyAt(summonAt);
+                    var difficulty = level.getCurrentDifficultyAt(summonAt);
                     var captainCornelia = new CaptainCorneliaBoss(AquamiraeEntityTypes.CAPTAIN_CORNELIA.get(), level);
                     captainCornelia.moveTo(summonAt.getCenter());
-                    captainCornelia.finalizeSpawn(level, difficulty, MobSpawnType.MOB_SUMMONED, null);
+                    captainCornelia.finalizeSpawn(level, difficulty, EntitySpawnReason.MOB_SUMMONED, null);
                     level.addFreshEntity(captainCornelia);
                     summoner.sendSystemMessage(FEEDBACK_SUMMON_CAPTAIN_CORNELIA.copy().withStyle(ChatFormatting.LIGHT_PURPLE));
                 }

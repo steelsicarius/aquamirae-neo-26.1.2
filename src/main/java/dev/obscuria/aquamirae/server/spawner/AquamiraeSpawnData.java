@@ -5,6 +5,7 @@ import dev.obscuria.aquamirae.registry.AquamiraeEntityTypes;
 import dev.obscuria.fragmentum.v2.api.config.ConfigValue;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.util.random.Weighted;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 
@@ -72,8 +73,8 @@ public enum AquamiraeSpawnData {
         this.maxCount = maxCount;
     }
 
-    public static List<MobSpawnSettings.SpawnerData> bake(MobCategory category) {
-        var result = new ArrayList<MobSpawnSettings.SpawnerData>();
+    public static List<Weighted<MobSpawnSettings.SpawnerData>> bake(MobCategory category) {
+        var result = new ArrayList<Weighted<MobSpawnSettings.SpawnerData>>();
         for (var value : values()) {
             if (value.mobCategory != category) continue;
             if (!value.enabled.get()) continue;
@@ -82,7 +83,7 @@ public enum AquamiraeSpawnData {
         return result;
     }
 
-    public MobSpawnSettings.SpawnerData bake() {
-        return new MobSpawnSettings.SpawnerData(typeSupplier.get(), weight.get(), minCount.get(), maxCount.get());
+    public Weighted<MobSpawnSettings.SpawnerData> bake() {
+        return new Weighted<>(new MobSpawnSettings.SpawnerData(typeSupplier.get(), minCount.get(), maxCount.get()), weight.get());
     }
 }

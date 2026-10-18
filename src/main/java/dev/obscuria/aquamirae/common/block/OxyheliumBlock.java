@@ -7,7 +7,6 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -20,7 +19,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.redstone.Orientation;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.SoundType;
@@ -53,7 +55,7 @@ public class OxyheliumBlock extends Block implements SimpleWaterloggedBlock {
                 .noCollision()
                 .speedFactor(0.8f)
                 .jumpFactor(0.8f)
-                .hasPostProcess((bs, br, bp) -> isGlowing(bs))
+                .postProcess((bs, br, bp) -> isGlowing(bs) ? bp : null)
                 .emissiveRendering((bs, br, bp) -> isGlowing(bs))
                 .lightLevel(s -> isGlowing(s) ? 12 : 0));
         registerDefaultState(stateDefinition.any()
@@ -81,11 +83,10 @@ public class OxyheliumBlock extends Block implements SimpleWaterloggedBlock {
 
     @Override
     public BlockState updateShape(
-            BlockState state, Direction facing, BlockState facingState,
-            LevelAccessor level, BlockPos currentPos, BlockPos facingPos
+            BlockState state, LevelReader level, ScheduledTickAccess ticks,
+            BlockPos currentPos, Direction facing, BlockPos facingPos, BlockState facingState, RandomSource random
     ) {
-        if (state.getValue(WATERLOGGED)) level.scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
-        return super.updateShape(state, facing, facingState, level, currentPos, facingPos);
+if (state.getValue(WATERLOGGED)) ticks.scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(level));        return super.updateShape(state, level, ticks, currentPos, facing, facingPos, facingState, random);
     }
 
     @Override
@@ -96,7 +97,7 @@ public class OxyheliumBlock extends Block implements SimpleWaterloggedBlock {
     @Override
     public void neighborChanged(
             BlockState state, Level level, BlockPos pos,
-            Block neighborBlock, BlockPos fromPos, boolean moving
+            Block neighborBlock, Orientation orientation, boolean movedByPiston
     ) {
         super.neighborChanged(state, level, pos, neighborBlock, fromPos, moving);
         var aboveState = level.getBlockState(pos.above());
@@ -174,7 +175,7 @@ public class OxyheliumBlock extends Block implements SimpleWaterloggedBlock {
 
         if (!level.isClientSide() && entity.hasEffect(MobEffects.WATER_BREATHING) && Objects.requireNonNull(entity.getEffect(MobEffects.WATER_BREATHING)).getDuration() > 1200) {
             level.playSound(null, pos, SoundEvents.AMBIENT_CAVE.value(), SoundSource.BLOCKS, 1, 1);
-            entity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 200, 1));
+            entity.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 200, 1));
         }
         return InteractionResult.SUCCESS;
     }

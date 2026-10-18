@@ -8,7 +8,8 @@ import dev.obscuria.aquamirae.client.model.ModelHangingChest;
 import dev.obscuria.aquamirae.common.entity.Shellback;
 import dev.obscuria.aquamirae.common.entity.ShellbackChestType;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.Identifier;
 import com.geckolib.cache.model.GeoBone;
@@ -56,7 +57,7 @@ public class HangingChestLayer<T extends GeoAnimatable> extends GeoRenderLayer<T
             MultiBufferSource bufferSource, VertexConsumer buffer, float partialTick,
             int packedLight, int packedOverlay
     ) {
-        if (!bone.getName().equals(boneName) || !visibilityPredicate.test(animatable)) return;
+        if (!bone.name().equals(boneName) || !visibilityPredicate.test(animatable)) return;
 
         poseStack.pushPose();
         RenderUtil.translateAndRotateMatrixForBone(poseStack, bone);

@@ -1,61 +1,71 @@
 package dev.obscuria.aquamirae.registry;
 
-import com.google.common.base.Suppliers;
-import lombok.Getter;
+import dev.obscuria.aquamirae.Aquamirae;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.Tier;
-import net.minecraft.world.item.Tiers;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ToolMaterial;
 
-import java.util.function.Supplier;
+import java.util.Locale;
 
-public enum AquamiraeTiers implements Tier {
+/**
+ * MC 26.1.2: the old {@code Tier} interface is gone; tool data is now carried by
+ * {@link ToolMaterial}. Each tier keeps its custom durability (uses) and the
+ * mining properties of its vanilla base material. Repair ingredients are now
+ * tag-driven: {@code data/aquamirae/tags/item/repairs/<tier>.json} must list the
+ * repair items (see port report).
+ */
+public enum AquamiraeTiers {
 
-    REMNANT_SABER(Tiers.STONE, 250, () -> Ingredient.of(AquamiraeItems.SHARP_BONES, AquamiraeItems.SHIP_GRAVEYARD_ECHO)),
-    TERRIBLE_BLADE(Tiers.IRON, 750, () -> Ingredient.of(AquamiraeItems.ANGLER_FANG, AquamiraeItems.SHIP_GRAVEYARD_ECHO)),
-    TERRIBLE_FANG(Tiers.IRON, 750, () -> Ingredient.of(AquamiraeItems.ANGLER_FANG, AquamiraeItems.SHIP_GRAVEYARD_ECHO)),
-    TERRIBLE_CLEAVER(Tiers.IRON, 750, () -> Ingredient.of(AquamiraeItems.ANGLER_FANG, AquamiraeItems.SHIP_GRAVEYARD_ECHO)),
-    DAGGER_OF_GREED(Tiers.DIAMOND, 0, () -> Ingredient.EMPTY),
-    SHATTERBLADE(Tiers.DIAMOND, 2200, () -> Ingredient.of(AquamiraeItems.ABYSSAL_AMETHYST, AquamiraeItems.SHIP_GRAVEYARD_ECHO)),
-    SHATTERSPIKE(Tiers.DIAMOND, 1400, () -> Ingredient.of(AquamiraeItems.ABYSSAL_AMETHYST, AquamiraeItems.SHIP_GRAVEYARD_ECHO)),
-    TIDEPIERCER(Tiers.NETHERITE, 4400, () -> Ingredient.of(AquamiraeItems.SHIP_GRAVEYARD_ECHO)),
-    JAWBREAKER(Tiers.NETHERITE, 4400, () -> Ingredient.of(AquamiraeItems.SHIP_GRAVEYARD_ECHO)),
-    TEMPEST_TRIDENT(Tiers.NETHERITE, 4400, () -> Ingredient.of(AquamiraeItems.SHIP_GRAVEYARD_ECHO)),
-    DREADWAKE(Tiers.NETHERITE, 4400, () -> Ingredient.of(AquamiraeItems.ABYSSAL_AMETHYST, AquamiraeItems.SHIP_GRAVEYARD_ECHO));
+    REMNANT_SABER(ToolMaterial.STONE, 250),
+    TERRIBLE_BLADE(ToolMaterial.IRON, 750),
+    TERRIBLE_FANG(ToolMaterial.IRON, 750),
+    TERRIBLE_CLEAVER(ToolMaterial.IRON, 750),
+    DAGGER_OF_GREED(ToolMaterial.DIAMOND, 0),
+    SHATTERBLADE(ToolMaterial.DIAMOND, 2200),
+    SHATTERSPIKE(ToolMaterial.DIAMOND, 1400),
+    TIDEPIERCER(ToolMaterial.NETHERITE, 4400),
+    JAWBREAKER(ToolMaterial.NETHERITE, 4400),
+    TEMPEST_TRIDENT(ToolMaterial.NETHERITE, 4400),
+    DREADWAKE(ToolMaterial.NETHERITE, 4400);
 
-    @Getter private final int uses;
-    private final Tier baseTier;
-    private final Supplier<Ingredient> repairIngredient;
+    private final ToolMaterial baseMaterial;
+    private final int uses;
 
-    AquamiraeTiers(Tier baseTier, int uses, Supplier<Ingredient> repairIngredient) {
+    AquamiraeTiers(ToolMaterial baseMaterial, int uses) {
+        this.baseMaterial = baseMaterial;
         this.uses = uses;
-        this.baseTier = baseTier;
-        this.repairIngredient = Suppliers.memoize(repairIngredient::get);
     }
 
-    @Override
-    public float getSpeed() {
-        return baseTier.getSpeed();
+    public int getUses() {
+        return this.uses;
     }
 
-    @Override
-    public TagKey<Block> getIncorrectBlocksForDrops() {
-        return baseTier.getIncorrectBlocksForDrops();
+    public ToolMaterial baseMaterial() {
+        return this.baseMaterial;
     }
 
-    @Override
-    public int getEnchantmentValue() {
-        return baseTier.getEnchantmentValue();
+    /**
+     * The material used by {@code Item.Properties#sword}. Attack damage bonus
+     * stays 0 (matching the old {@code Tier#getAttackDamageBonus} override);
+     * repair items come from a per-tier item tag.
+     */
+    public ToolMaterial material() {
+        return new ToolMaterial(
+                this.baseMaterial.incorrectBlocksForDrops(),
+                this.uses,
+                this.baseMaterial.speed(),
+                0.0F,
+                this.baseMaterial.enchantmentValue(),
+                repairItems());
     }
 
-    @Override
-    public Ingredient getRepairIngredient() {
-        return this.repairIngredient.get();
-    }
-
-    @Override
-    public float getAttackDamageBonus() {
-        return 0;
+    /**
+     * Unbound tag keys match nothing, which faithfully reproduces the old
+     * {@code Ingredient.EMPTY} ("cannot be repaired") case; tiers with actual
+     * repair items get their entries from datapack tag files.
+     */
+    public TagKey<Item> repairItems() {
+        return TagKey.create(Registries.ITEM, Aquamirae.id("repairs/" + name().toLowerCase(Locale.ROOT)));
     }
 }

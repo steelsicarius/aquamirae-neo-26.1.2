@@ -6,6 +6,7 @@ import dev.obscuria.aquamirae.registry.AquamiraeItems;
 import dev.obscuria.aquamirae.registry.AquamiraeParticleTypes;
 import dev.obscuria.aquamirae.registry.AquamiraeSounds;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -54,8 +55,8 @@ public class GoldenMoth extends Animal implements GeoEntity {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "Default", 10,
-                state -> state.getAnimatable().onGround()
+        controllers.add(new AnimationController<GoldenMoth>("Default", 10,
+                state -> state.animatable().onGround()
                         ? state.setAndContinue(DefaultAnimations.IDLE)
                         : state.setAndContinue(DefaultAnimations.FLY))
                 .setOverrideEasingType(EasingType.EASE_IN_OUT_CUBIC));
@@ -72,19 +73,17 @@ public class GoldenMoth extends Animal implements GeoEntity {
     }
 
     @Override
-    public boolean causeFallDamage(float fallDistance, float multiplier, DamageSource source) {
+    public boolean causeFallDamage(double fallDistance, float multiplier, DamageSource source) {
         return false;
     }
 
     @Override
-    public boolean hurt(DamageSource source, float amount) {
-        if (level() instanceof ServerLevel level) {
-            var options = Objects.requireNonNull(AquamiraeParticleTypes.SHINE.simple());
-            level.sendParticles(options,
-                    getX(), getY(), getZ(), 6,
-                    0.05, 0.05, 0.05, 0.8);
-        }
-        return super.hurt(source, amount);
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
+        var options = Objects.requireNonNull(AquamiraeParticleTypes.SHINE.simple());
+        level.sendParticles(options,
+                getX(), getY(), getZ(), 6,
+                0.05, 0.05, 0.05, 0.8);
+        return super.hurtServer(level, source, amount);
     }
 
     @Override
@@ -97,18 +96,18 @@ public class GoldenMoth extends Animal implements GeoEntity {
         var stack = player.getItemInHand(hand);
         if (stack.is(Items.GLASS_BOTTLE)) {
             stack.shrink(1);
-            if (!level().isClientSide()) {
-                this.level().playSound(null, this.blockPosition(), AquamiraeSounds.ENTITY_GOLDEN_MOTH_CATCH, SoundSource.AMBIENT, 1, 1);
-                this.spawnAtLocation(AquamiraeItems.GOLDEN_MOTH_JAR);
+            if (this.level() instanceof ServerLevel server) {
+                server.playSound(null, this.blockPosition(), AquamiraeSounds.ENTITY_GOLDEN_MOTH_CATCH, SoundSource.AMBIENT, 1, 1);
+                this.spawnAtLocation(server, AquamiraeItems.GOLDEN_MOTH_JAR.get());
                 this.discard();
             }
         }
-        return InteractionResult.sidedSuccess(level().isClientSide);
+        return level().isClientSide() ? InteractionResult.SUCCESS : InteractionResult.SUCCESS_SERVER;
     }
 
     @Override
     public void baseTick() {
-        if (isInWaterOrBubble()) {
+        if (isInWater() || this.level().getBlockState(this.blockPosition()).is(Blocks.BUBBLE_COLUMN)) {
             addDeltaMovement(new Vec3(0, 0.05, 0));
         }
         super.baseTick();
@@ -117,7 +116,7 @@ public class GoldenMoth extends Animal implements GeoEntity {
     @Override
     public void tick() {
         super.tick();
-        if (level().isClientSide && tickCount % 4 == 0) {
+        if (level().isClientSide() && tickCount % 4 == 0) {
             var motion = getDeltaMovement().scale(3);
             var particleType = Objects.requireNonNull(AquamiraeParticleTypes.SHINE.simple());
             level().addParticle(particleType,
@@ -136,7 +135,7 @@ public class GoldenMoth extends Animal implements GeoEntity {
     @Override
     public SpawnGroupData finalizeSpawn(
             ServerLevelAccessor level, DifficultyInstance difficulty,
-            MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData
+            EntitySpawnReason spawnType, @Nullable SpawnGroupData spawnGroupData
     ) {
         ConfiguredAttribute.applyAttributes(this, CommonConfig.GOLDEN_MOTH_ATTRIBUTES);
         return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);

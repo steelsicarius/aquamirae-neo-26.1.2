@@ -2,8 +2,12 @@ package dev.obscuria.aquamirae.common.entity;
 
 import dev.obscuria.aquamirae.api.common.entity.SubPartEntity;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.*;
@@ -47,7 +51,7 @@ public class ShellbackChestPart extends SubPartEntity<Shellback> {
 
         if (!level().isClientSide()) {
             getParent().setChest(chestIndex, true);
-            playSound(SoundEvents.ARMOR_EQUIP_IRON.value());
+            playSound(SoundEvents.ARMOR_EQUIP_IRON.value().value());
             if (!player.getAbilities().instabuild) {
                 stack.shrink(1);
             }
@@ -60,33 +64,33 @@ public class ShellbackChestPart extends SubPartEntity<Shellback> {
 
         if (!level().isClientSide()) {
             getParent().dropChestContents(chestIndex);
-            spawnAtLocation(Blocks.CHEST);
+            if (this.level() instanceof ServerLevel server) this.spawnAtLocation(server, Blocks.CHEST);
             getParent().setChest(chestIndex, false);
             playSound(SoundEvents.SHEEP_SHEAR, 0.8f, 1.0f);
             var shears = player.getItemInHand(hand);
             if (!player.getAbilities().instabuild) {
-                shears.hurtAndBreak(1, player, LivingEntity.getSlotForHand(hand));
+                shears.hurtAndBreak(1, player, hand.asEquipmentSlot());
             }
         }
         return true;
     }
 
     @Override
-    public InteractionResult interact(Player player, InteractionHand hand) {
-        if (hand != InteractionHand.MAIN_HAND) return getParent().interact(player, hand);
+    public InteractionResult interact(Player player, InteractionHand hand, Vec3 location) {
+        if (hand != InteractionHand.MAIN_HAND) return getParent().interact(player, hand, location);
 
         var stack = player.getItemInHand(hand);
         boolean hasChest = getParent().hasChest(chestIndex);
 
         if (!hasChest && stack.is(Items.CHEST)) {
             return attachChest(player, hand)
-                    ? InteractionResult.sidedSuccess(level().isClientSide())
+                    ? level().isClientSide() ? InteractionResult.SUCCESS : InteractionResult.SUCCESS_SERVER
                     : InteractionResult.PASS;
         }
 
         if (hasChest && stack.is(Items.SHEARS)) {
             return detachChest(player, hand)
-                    ? InteractionResult.sidedSuccess(level().isClientSide())
+                    ? level().isClientSide() ? InteractionResult.SUCCESS : InteractionResult.SUCCESS_SERVER
                     : InteractionResult.PASS;
         }
 
@@ -97,7 +101,7 @@ public class ShellbackChestPart extends SubPartEntity<Shellback> {
             return InteractionResult.CONSUME;
         }
 
-        return getParent().interact(player, hand);
+        return getParent().interact(player, hand, location);
     }
 
     @Override
@@ -116,12 +120,12 @@ public class ShellbackChestPart extends SubPartEntity<Shellback> {
     }
 
     @Override
-    public boolean hurt(DamageSource source, float amount) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
         if (isInvulnerableTo(source)) {
-            playSound(SoundEvents.SHIELD_BLOCK);
+            playSound(SoundEvents.SHIELD_BLOCK.value());
             return false;
         }
-        return getParent().hurt(source, amount);
+        return getParent().hurtServer(level, source, amount);
     }
 
     @Override
@@ -143,10 +147,10 @@ public class ShellbackChestPart extends SubPartEntity<Shellback> {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {}
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag tag) {}
+    protected void readAdditionalSaveData(ValueInput input) {}
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag tag) {}
+    protected void addAdditionalSaveData(ValueOutput output) {}
 
     protected ChestMenu createMenu(int containerId, Inventory playerInventory, Player player) {
         var chestView = getParent().getInventory().createChestView(this, chestIndex);
