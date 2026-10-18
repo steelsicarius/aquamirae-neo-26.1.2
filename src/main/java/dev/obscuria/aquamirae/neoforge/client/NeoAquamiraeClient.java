@@ -4,7 +4,9 @@ import dev.obscuria.aquamirae.Aquamirae;
 import dev.obscuria.aquamirae.client.AquamiraeClient;
 import dev.obscuria.aquamirae.integration.hook.client.HookBossHealthOverlay;
 import dev.obscuria.aquamirae.config.ConfigScreenBuilder;
+import dev.obscuria.aquamirae.neoforge.client.NeoClientEvents;
 import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
@@ -15,10 +17,12 @@ import net.neoforged.neoforge.common.NeoForge;
 @Mod(value = Aquamirae.MOD_ID, dist = Dist.CLIENT)
 public final class NeoAquamiraeClient {
 
-    public NeoAquamiraeClient() {
+    public NeoAquamiraeClient(IEventBus modEventBus) {
         AquamiraeClient.init();
         registerConfigScreen();
         NeoForge.EVENT_BUS.register(NeoAquamiraeClient.class);
+        NeoForge.EVENT_BUS.register(NeoClientEvents.GameBus.class);
+        modEventBus.register(NeoClientEvents.ModBus.class);
     }
 
     @SubscribeEvent

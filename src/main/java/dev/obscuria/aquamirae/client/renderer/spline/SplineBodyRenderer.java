@@ -296,7 +296,7 @@ public abstract class SplineBodyRenderer<T extends SplineBody, D extends BodyDec
             int overlay, int light, Color color
     ) {
         c.addVertex(t, x, y, z)
-                .setColor(color.decimal())
+                .setColor(color.argb())
                 .setUv(u, v)
                 .setOverlay(overlay)
                 .setLight(light)

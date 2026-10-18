@@ -9,6 +9,7 @@ import dev.obscuria.aquamirae.registry.AquamiraeSounds;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.sounds.Music;
+import org.jetbrains.annotations.Nullable;
 import net.minecraft.sounds.Musics;
 
 import java.util.Objects;
@@ -21,7 +22,7 @@ public final class HookMinecraft {
     }
 
     public static void onRunTick(Minecraft minecraft) {
-        CameraShake.tick(minecraft.getTimer().getGameTimeDeltaTicks() / 20.0f);
+        CameraShake.tick(minecraft.getDeltaTracker().getGameTimeDeltaTicks() / 20.0f);
     }
 
     public static void supplyMenuMusic(Minecraft minecraft, Music current, Consumer<Music> consumer) {
@@ -31,12 +32,17 @@ public final class HookMinecraft {
         consumer.accept(AquamiraeMusic.TITLE_SCREEN_THEME.get());
     }
 
-    public static void supplyGameplayMusic(Minecraft minecraft, Consumer<Music> consumer) {
-        if (minecraft.level == null || minecraft.player == null) return;
-        if (!AquamiraeHelper.isInIceMaze(minecraft.player)) return;
-        consumer.accept(minecraft.level.isRaining()
+    /**
+     * MC 26.1.2: situational music resolves through the environment attribute
+     * BACKGROUND_MUSIC, so this hook returns the override (or null) instead of
+     * consuming a callback after the biome lookup.
+     */
+    public static @Nullable Music gameplayMusic(Minecraft minecraft) {
+        if (minecraft.level == null || minecraft.player == null) return null;
+        if (!AquamiraeHelper.isInIceMaze(minecraft.player)) return null;
+        return minecraft.level.isRaining()
                 ? AquamiraeMusic.BLIZZARD_THEME.get()
-                : AquamiraeMusic.ICE_MAZE_THEME.get());
+                : AquamiraeMusic.ICE_MAZE_THEME.get();
     }
 
     public static void supplyBossMusic(Minecraft minecraft, Consumer<Music> consumer) {

@@ -23,19 +23,18 @@
   "client": [
     "client.MixinClientLevel",
     "client.MixinEntityRenderDispatcher",
-    "client.MixinFogRenderer",
     "client.MixinGameRenderer",
-    "client.MixinItemRenderer",
+    "client.MixinGuiRenderer",
+    "client.MixinItemModelResolver",
+    "client.MixinItemStackRenderState",
     "client.MixinLevelRenderer",
     "client.MixinLogoRenderer",
     "client.MixinMinecraft",
     "client.MixinPillagerRenderer",
-    "client.MixinScreen",
-    "client.MixinTitleScreen",
-    "client.MixinVindicatorRenderer"
+    "client.MixinVindicatorRenderer",
+    "client.MixinWeatherEffectRenderer"
   ],
   "injectors": {
     "defaultRequire": 1
   }
 }
-

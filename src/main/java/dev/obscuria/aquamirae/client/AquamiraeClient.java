@@ -24,9 +24,6 @@ import dev.obscuria.fragmentum.v2.api.client.FragmentumClientRegistry;
 import dev.obscuria.fragmentum.v2.api.client.TooltipComponentRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.CubeMap;
-import net.minecraft.client.renderer.PanoramaRenderer;
-import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
-import net.minecraft.client.renderer.item.CompassItemPropertyFunction;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.Identifier;
@@ -41,7 +38,12 @@ import com.geckolib.loading.math.value.Variable;
 public final class AquamiraeClient {
 
     public static final String MOLANG_SCUTTLER_WALK;
-    public static final PanoramaRenderer PANORAMA;
+    /**
+     * MC 26.1.2: PanoramaRenderer was replaced by CubeMap, which the GuiRenderer
+     * renders from a fixed vanilla field; MixinGuiRenderer swaps that field for
+     * this one when the themed main menu is enabled.
+     */
+    public static final CubeMap PANORAMA = new CubeMap(Aquamirae.id("textures/gui/title/panorama"));
     public static final Identifier PIRATE_PILLAGER_TEXTURE;
     public static final Identifier PIRATE_VINDICATOR_TEXTURE;
 
@@ -65,6 +67,7 @@ public final class AquamiraeClient {
     public static void init() {
 
         ClientConfig.init();
+        PANORAMA.registerTextures(Minecraft.getInstance().getTextureManager());
         var registrar = FragmentumClientRegistry.registrar(Aquamirae.MOD_ID);
 
         TooltipComponentRegistry.register(AbilitySetTooltip.class, ClientAbilitySetTooltip::create);
@@ -105,18 +108,15 @@ public final class AquamiraeClient {
         registrar.registerTexturedParticleRenderer(AquamiraeParticleTypes.GHOST_SHINE, GhostShineParticle.Provider::new);
         registrar.registerTexturedParticleRenderer(AquamiraeParticleTypes.GHOST, GhostParticle.Provider::new);
 
-        registrar.registerItemProperty(Aquamirae.id("echo_compass/angle"), echoCompassAngle());
+        // MC 26.1.2: item model properties are data-driven now; the echo compass
+        // angle property is registered through RegisterRangeSelectItemModelPropertyEvent
+        // (see NeoClientModBusEvents) and referenced from the item definition JSON.
 
         MathParser.registerVariable(new Variable(MOLANG_SCUTTLER_WALK, 0.0f));
     }
 
-    private static ClampedItemPropertyFunction echoCompassAngle() {
-        return new CompassItemPropertyFunction((level, stack, entity) -> stack.get(AquamiraeDataComponents.ECHO_TRACKER));
-    }
-
     static {
         MOLANG_SCUTTLER_WALK = "aquamirae.scuttler_walk";
-        PANORAMA = new PanoramaRenderer(new CubeMap(Aquamirae.id("textures/gui/title/panorama")));
         PIRATE_PILLAGER_TEXTURE = Aquamirae.id("textures/entity/pirate_pillager.png");
         PIRATE_VINDICATOR_TEXTURE = Aquamirae.id("textures/entity/pirate_vindicator.png");
     }

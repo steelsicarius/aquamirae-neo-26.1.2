@@ -14,9 +14,9 @@ public final class FogEvents {
     @Nullable public static FogColorCallback SET_COLOR = null;
     @Nullable public static FogDistanceCallback SET_DISTANCE =
             ((camera, fogType, fogMode, farPlane, partialTicks, start, end) -> {
-                var level = camera.getEntity().level();
+                var level = camera.entity().level();
                 if (!level.isRaining()) return null;
-                if (!level.getBiome(camera.getBlockPosition()).is(AquamiraeBiomeTags.HAS_BLIZZARD)) return null;
+                if (!level.getBiome(camera.blockPosition()).is(AquamiraeBiomeTags.HAS_BLIZZARD)) return null;
                 return FogDistanceResult.of(
                         ClientConfig.BLIZZARD_FOG_START.get().floatValue(),
                         ClientConfig.BLIZZARD_FOG_END.get().floatValue());

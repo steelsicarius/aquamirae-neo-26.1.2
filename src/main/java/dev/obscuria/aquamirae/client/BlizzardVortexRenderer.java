@@ -76,7 +76,7 @@ public final class BlizzardVortexRenderer {
         float dt = Math.min((now - lastMs) / 1000f, 0.05f);
         lastMs = now;
 
-        boolean active = isActive(level, camera.getBlockPosition());
+        boolean active = isActive(level, camera.blockPosition());
         fadeAlpha = active
                 ? Math.min(1f, fadeAlpha + dt / FADE_SEC)
                 : Math.max(0f, fadeAlpha - dt / FADE_SEC);
