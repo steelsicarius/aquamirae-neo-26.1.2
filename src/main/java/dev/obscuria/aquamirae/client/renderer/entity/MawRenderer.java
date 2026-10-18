@@ -9,7 +9,7 @@ import dev.obscuria.aquamirae.client.renderer.entity.state.MawRenderState;
 import dev.obscuria.aquamirae.common.entity.Maw;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.client.renderer.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 

@@ -1,5 +1,7 @@
 package dev.obscuria.aquamirae.client.model;
 
+import dev.obscuria.aquamirae.client.renderer.entity.state.MazeMotherRenderState;
+
 import dev.obscuria.aquamirae.client.animation.AnimPipeline;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
@@ -86,7 +88,7 @@ public class ModelMazeMother extends AnimatedEntityModel<MazeMotherRenderState> 
 
 
     @Override
-    public void setupAnim(MazeMotherRenderState) {
+    public void setupAnim(MazeMotherRenderState state) {
         float limbSwing = state.walkAnimationPos;
         float limbSwingAmount = state.walkAnimationSpeed;
         float ageInTicks = state.ageInTicks;

@@ -28,7 +28,7 @@ public class ModelShard extends EntityModel<ShardRenderState> {
 
 
     @Override
-    public void setupAnim(ShardRenderState) {
+    public void setupAnim(ShardRenderState state) {
         float ageInTicks = state.ageInTicks;
         float netHeadYaw = state.localXRot;
         float headPitch = state.localYRot;

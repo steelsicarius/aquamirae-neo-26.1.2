@@ -55,15 +55,17 @@ public class StashBlock extends HorizontalDirectionalBlock implements SimpleWate
     @Override
     public BlockState updateShape(
             BlockState state,
-            Direction facing,
-            BlockState facingState,
-            LevelAccessor world,
+            LevelReader level,
+            ScheduledTickAccess ticks,
             BlockPos currentPos,
-            BlockPos facingPos
+            Direction directionToNeighbour,
+            BlockPos neighbourPos,
+            BlockState neighbourState,
+            RandomSource random
     ) {
         if (state.getValue(BlockStateProperties.WATERLOGGED))
-            world.scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
-        return super.updateShape(state, facing, facingState, world, currentPos, facingPos);
+            ticks.scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+        return super.updateShape(state, level, ticks, currentPos, directionToNeighbour, neighbourPos, neighbourState, random);
     }
 
     @Override

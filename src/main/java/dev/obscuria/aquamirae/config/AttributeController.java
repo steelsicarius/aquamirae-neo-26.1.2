@@ -13,6 +13,8 @@ import dev.obscuria.aquamirae.AquamiraeHelper;
 import dev.obscuria.aquamirae.config.data.DoubleRange;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.ai.attributes.Attributes;

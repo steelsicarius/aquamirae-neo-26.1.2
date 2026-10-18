@@ -1,5 +1,7 @@
 package dev.obscuria.aquamirae.client.model;
 
+import dev.obscuria.aquamirae.client.renderer.entity.state.EelRenderState;
+
 import dev.obscuria.aquamirae.client.animation.AnimPipeline;
 import dev.obscuria.fragmentum.v2.api.common.Easing;
 import net.minecraft.client.model.geom.ModelPart;
@@ -80,7 +82,7 @@ public class ModelEel extends AnimatedEntityModel<EelRenderState> {
 
 
     @Override
-    public void setupAnim(EelRenderState) {
+    public void setupAnim(EelRenderState state) {
         float limbSwing = state.walkAnimationPos;
         float limbSwingAmount = state.walkAnimationSpeed;
         float ageInTicks = state.ageInTicks;

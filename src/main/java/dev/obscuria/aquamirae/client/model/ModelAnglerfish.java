@@ -1,5 +1,7 @@
 package dev.obscuria.aquamirae.client.model;
 
+import dev.obscuria.aquamirae.client.renderer.entity.state.AnglerfishRenderState;
+
 import com.mojang.math.Constants;
 import dev.obscuria.aquamirae.client.animation.AnimPipeline;
 import dev.obscuria.fragmentum.v2.api.common.Easing;
@@ -67,7 +69,7 @@ public class ModelAnglerfish extends AnimatedEntityModel<AnglerfishRenderState> 
 
 
     @Override
-    public void setupAnim(AnglerfishRenderState) {
+    public void setupAnim(AnglerfishRenderState state) {
         float limbSwing = state.walkAnimationPos;
         float limbSwingAmount = state.walkAnimationSpeed;
         float ageInTicks = state.ageInTicks;

@@ -1,5 +1,7 @@
 package dev.obscuria.aquamirae.client.model;
 
+import dev.obscuria.aquamirae.client.renderer.entity.state.CaptainCorneliaRenderState;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.obscuria.aquamirae.client.animation.AnimPipeline;
 import dev.obscuria.fragmentum.v2.api.common.Easing;
@@ -114,7 +116,7 @@ public class ModelCaptainCornelia extends AnimatedEntityModel<CaptainCorneliaRen
     }
 
     @Override
-    public void setupAnim(CaptainCorneliaRenderState) {
+    public void setupAnim(CaptainCorneliaRenderState state) {
         float limbSwing = state.walkAnimationPos;
         float limbSwingAmount = state.walkAnimationSpeed;
         float ageInTicks = state.ageInTicks;

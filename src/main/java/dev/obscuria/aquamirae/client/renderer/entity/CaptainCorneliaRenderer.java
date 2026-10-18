@@ -9,7 +9,7 @@ import dev.obscuria.aquamirae.client.renderer.entity.state.CaptainCorneliaRender
 import dev.obscuria.aquamirae.common.entity.CaptainCorneliaBoss;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.client.renderer.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;

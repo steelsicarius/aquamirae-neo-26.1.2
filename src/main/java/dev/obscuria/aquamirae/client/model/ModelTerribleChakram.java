@@ -31,18 +31,7 @@ public class ModelTerribleChakram extends EntityModel<ChakramRenderState> {
 	}
 
 	@Override
-	public void renderToBuffer(
-			PoseStack poseStack, VertexConsumer vertexConsumer,
-			int packedLight, int packedOverlay, int color
-	) {
-		this.main.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
-	}
-
-	@Override
-	public void setupAnim(
-			T entity, float limbSwing, float limbSwingAmount,
-			float ageInTicks, float netHeadYaw, float headPitch
-	) {
-		this.main.yRot = ageInTicks * 0.8F;
+	public void setupAnim(ChakramRenderState state) {
+		this.main.yRot = state.ageInTicks * 0.8F;
 	}
 }

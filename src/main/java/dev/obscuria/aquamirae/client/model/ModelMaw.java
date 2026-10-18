@@ -1,5 +1,7 @@
 package dev.obscuria.aquamirae.client.model;
 
+import dev.obscuria.aquamirae.client.renderer.entity.state.MawRenderState;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.obscuria.aquamirae.client.animation.AnimPipeline;
 import dev.obscuria.aquamirae.client.animation.AnimPipeline.ContextVar;

@@ -1,19 +1,45 @@
 package dev.obscuria.aquamirae.client;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.pipeline.BlendFunction;
+import com.mojang.blaze3d.pipeline.ColorTargetState;
+import com.mojang.blaze3d.pipeline.DepthStencilState;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.platform.CompareOp;
+import com.mojang.blaze3d.shaders.UniformType;
 import com.mojang.blaze3d.vertex.*;
 import dev.obscuria.aquamirae.Aquamirae;
 import dev.obscuria.fragmentum.v2.api.common.Color;
-import dev.obscuria.fragmentum.v2.api.common.Color;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.rendertype.RenderSetup;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import org.joml.Matrix4f;
 
 public final class BlizzardVortexRenderer {
+
+    /**
+     * MC 26.1.2: RenderSystem GL state (blendFunc/depthMask/…) is gone; blending
+     * and depth behaviour live on a RenderPipeline now. This pipeline reproduces
+     * the old setup: POSITION_COLOR quads, additive (SRC_ALPHA, ONE) blend,
+     * depth test on but no depth writes, cull disabled.
+     */
+    private static final RenderPipeline PIPELINE = RenderPipeline.builder()
+            .withLocation("aquamirae:blizzard_vortex")
+            .withUniform("DynamicTransforms", UniformType.UNIFORM_BUFFER)
+            .withUniform("Projection", UniformType.UNIFORM_BUFFER)
+            .withVertexShader("core/position_color")
+            .withFragmentShader("core/position_color")
+            .withColorTargetState(new ColorTargetState(BlendFunction.LIGHTNING))
+            .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
+            .withDepthStencilState(new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false))
+            .withCull(false)
+            .build();
+
+    private static final RenderType TYPE = RenderType.create(
+            "aquamirae:blizzard_vortex",
+            RenderSetup.builder(PIPELINE).createRenderSetup());
 
     private static final int MAIN_ARMS = 4;
     private static final int SEC_ARMS = 3;
@@ -33,7 +59,7 @@ public final class BlizzardVortexRenderer {
     private static final float MAIN_ALPHA = 0.33f;
     private static final float SEC_ALPHA = 0.14f;
 
-    public static final ARGB COLOR = Color.components(1f, 0.78f, 0.89f, 1.00f);
+    public static final Color COLOR = Color.components(1f, 0.78f, 0.89f, 1.00f);
 
     private static final float FADE_SEC = 5f;
 
@@ -57,16 +83,6 @@ public final class BlizzardVortexRenderer {
         if (fadeAlpha < 0.002f) return;
 
         float t = (level.getGameTime() + partialTick) * 0.05f;
-
-        RenderSystem.enableBlend();
-        RenderSystem.blendFunc(
-                GlStateManager.SourceFactor.SRC_ALPHA,
-                GlStateManager.DestFactor.ONE);
-        RenderSystem.depthMask(false);
-        RenderSystem.enableDepthTest();
-        RenderSystem.disableCull();
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
-        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 
         PoseStack ps = new PoseStack();
         Matrix4f mat = ps.last().pose();
@@ -92,13 +108,7 @@ public final class BlizzardVortexRenderer {
                     Math.min(1f, COLOR.red() + 0.08f), Math.min(1f, COLOR.green() + 0.05f), COLOR.blue(), t, -1f);
         }
 
-        BufferUploader.drawWithShader(buf.buildOrThrow());
-
-        RenderSystem.enableCull();
-        RenderSystem.depthMask(true);
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.disableBlend();
-        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+        TYPE.draw(buf.buildOrThrow());
     }
 
     private void emitArm(BufferBuilder buf, Matrix4f mat,

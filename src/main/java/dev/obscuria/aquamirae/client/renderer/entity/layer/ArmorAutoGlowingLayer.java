@@ -5,7 +5,7 @@ import dev.obscuria.aquamirae.common.item.AquamiraeArmorItem;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import com.geckolib.renderer.GeoArmorRenderer;
-import com.geckolib.renderer.GeoRenderer;
+import com.geckolib.renderer.base.GeoRenderer;
 import com.geckolib.renderer.layer.builtin.AutoGlowingGeoLayer;
 import org.jetbrains.annotations.Nullable;
 

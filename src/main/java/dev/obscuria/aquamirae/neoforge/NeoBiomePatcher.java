@@ -7,8 +7,8 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.attribute.AmbientParticle;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.level.biome.AmbientParticleSettings;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.levelgen.GenerationStep;
@@ -37,9 +37,13 @@ public record NeoBiomePatcher(
         this.builder.getMobSpawnSettings().mobSpawnCosts.clear();
     }
 
+    /**
+     * MC 26.1.2: the carving generation step was removed; carvers attach to the
+     * biome without a step. The step parameter was dropped from {@link BiomePatcher}.
+     */
     @Override
-    public void addCarver(GenerationStep.Carving carving, ResourceKey<ConfiguredWorldCarver<?>> carverKey) {
-        this.builder.getGenerationSettings().addCarver(carving, configuredCarvers.getHolderOrThrow(carverKey));
+    public void addCarver(ResourceKey<ConfiguredWorldCarver<?>> carverKey) {
+        this.builder.getGenerationSettings().addCarver(configuredCarvers.getHolderOrThrow(carverKey));
     }
 
     @Override
@@ -72,24 +76,42 @@ public record NeoBiomePatcher(
         this.builder.getClimateSettings().setDownfall(downfall);
     }
 
+    /**
+     * MC 26.1.2: ambient particles moved out of biomes into the environment
+     * attribute system (EnvironmentAttributes.AMBIENT_PARTICLES), which is baked
+     * from biome datapack JSON. NeoForge biome modifiers cannot patch it, so
+     * this is a no-op for now. A datapack biome override could restore it.
+     */
     @Override
-    public void setAmbientParticle(AmbientParticleSettings settings) {
-        this.builder.getSpecialEffects().ambientParticle(settings);
+    public void setAmbientParticle(AmbientParticle settings) {
+        // no-op: see class javadoc
     }
 
+    /**
+     * MC 26.1.2: ambient loops are an environment attribute now
+     * (EnvironmentAttributes.AMBIENT_SOUNDS); not patchable via biome modifiers. No-op for now.
+     */
     @Override
     public void setAmbientLoop(Holder<SoundEvent> sound) {
-        this.builder.getSpecialEffects().ambientLoopSound(sound);
+        // no-op: see class javadoc
     }
 
+    /**
+     * MC 26.1.2: fog color is an environment attribute
+     * (EnvironmentAttributes.FOG_COLOR); not patchable via biome modifiers. No-op for now.
+     */
     @Override
     public void setFogColor(int color) {
-        this.builder.getSpecialEffects().fogColor(color);
+        // no-op: see class javadoc
     }
 
+    /**
+     * MC 26.1.2: sky color is an environment attribute
+     * (EnvironmentAttributes.SKY_COLOR); not patchable via biome modifiers. No-op for now.
+     */
     @Override
     public void setSkyColor(int color) {
-        this.builder.getSpecialEffects().skyColor(color);
+        // no-op: see class javadoc
     }
 
     @Override
@@ -97,8 +119,12 @@ public record NeoBiomePatcher(
         this.builder.getSpecialEffects().waterColor(color);
     }
 
+    /**
+     * MC 26.1.2: water fog color is an environment attribute
+     * (EnvironmentAttributes.WATER_FOG_COLOR); not patchable via biome modifiers. No-op for now.
+     */
     @Override
     public void setWaterFogColor(int color) {
-        this.builder.getSpecialEffects().waterFogColor(color);
+        // no-op: see class javadoc
     }
 }

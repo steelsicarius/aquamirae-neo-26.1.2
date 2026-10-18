@@ -1,5 +1,7 @@
 package dev.obscuria.aquamirae.client.model;
 
+import dev.obscuria.aquamirae.client.renderer.entity.state.TorturedSoulRenderState;
+
 import dev.obscuria.aquamirae.client.animation.AnimPipeline;
 import dev.obscuria.fragmentum.v2.api.common.Easing;
 import net.minecraft.client.model.geom.ModelPart;
@@ -50,7 +52,7 @@ public class ModelTorturedSoul extends AnimatedEntityModel<TorturedSoulRenderSta
     }
 
     @Override
-    public void setupAnim(TorturedSoulRenderState) {
+    public void setupAnim(TorturedSoulRenderState state) {
         float limbSwing = state.walkAnimationPos;
         float limbSwingAmount = state.walkAnimationSpeed;
         float ageInTicks = state.ageInTicks;
