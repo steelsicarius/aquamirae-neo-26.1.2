@@ -2,8 +2,14 @@ package dev.obscuria.aquamirae.client.screen;
 
 import dev.obscuria.aquamirae.common.component.LogBookContents;
 import dev.obscuria.aquamirae.registry.AquamiraeDataComponents;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.ActiveTextCollector;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
@@ -11,8 +17,8 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
+import org.jspecify.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 
@@ -67,36 +73,36 @@ public class LogBookViewScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        super.render(graphics, mouseX, mouseY, partialTick);
-        graphics.blit(BOOK_LOCATION, this.leftPos, this.topPos, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
-        this.renderPage(graphics, mouseX, mouseY);
-        this.renderScrollbar(graphics);
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(graphics, mouseX, mouseY, partialTick);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, BOOK_LOCATION, this.leftPos, this.topPos, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_HEIGHT);
+        this.extractPage(graphics, mouseX, mouseY);
+        this.extractScrollbar(graphics);
     }
 
-    private void renderPage(GuiGraphics graphics, int mouseX, int mouseY) {
+    private void extractPage(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         int textX = this.leftPos + TEXT_MARGIN_X;
         int textY = this.topPos + TEXT_MARGIN_Y;
 
         graphics.enableScissor(textX, textY, textX + TEXT_WIDTH, textY + TEXT_HEIGHT);
 
-        for (int i = 0; i < this.lines.size(); i++) {
-            int lineY = (int) (textY + i * LINE_HEIGHT - this.scrollAmount);
-            if (lineY + LINE_HEIGHT < textY || lineY > textY + TEXT_HEIGHT) {
-                continue;
-            }
-            graphics.drawString(this.font, this.lines.get(i), textX, lineY, 0x000000, false);
-        }
+        // Text is drawn through the active text collector so hover/click styling keeps working
+        this.visitPage(graphics.textRenderer());
 
         graphics.disableScissor();
+    }
 
-        Style style = this.getStyleAt(mouseX, mouseY, textX, textY);
-        if (style != null) {
-            graphics.renderComponentHoverEffect(this.font, style, mouseX, mouseY);
+    private void visitPage(ActiveTextCollector collector) {
+        int textX = this.leftPos + TEXT_MARGIN_X;
+        int textY = this.topPos + TEXT_MARGIN_Y;
+
+        for (int i = 0; i < this.lines.size(); i++) {
+            int lineY = (int) (textY + i * LINE_HEIGHT - this.scrollAmount);
+            collector.accept(TextAlignment.LEFT, textX, lineY, this.lines.get(i));
         }
     }
 
-    private void renderScrollbar(GuiGraphics graphics) {
+    private void extractScrollbar(GuiGraphicsExtractor graphics) {
         if (this.maxScroll <= 0) {
             return;
         }
@@ -115,25 +121,18 @@ public class LogBookViewScreen extends Screen {
     }
 
     @Nullable
-    private Style getStyleAt(int mouseX, int mouseY, int textX, int textY) {
-        if (this.lines.isEmpty()) {
-            return null;
-        }
-        if (mouseX < textX || mouseX >= textX + TEXT_WIDTH) {
-            return null;
-        }
-        if (mouseY < textY || mouseY >= textY + TEXT_HEIGHT) {
-            return null;
-        }
+    private Style getStyleAt(double mouseX, double mouseY) {
+        var finder = new ActiveTextCollector.ClickableStyleFinder(this.font, (int) mouseX, (int) mouseY);
+        this.visitPage(finder);
+        return finder.result();
+    }
 
-        int relativeY = (int) (mouseY - textY + this.scrollAmount);
-        int line = relativeY / LINE_HEIGHT;
-        if (line < 0 || line >= this.lines.size()) {
-            return null;
+    protected boolean handleClickEvent(@Nullable ClickEvent event) {
+        if (event == null) {
+            return false;
         }
-
-        FormattedCharSequence sequence = this.lines.get(line);
-        return this.font.getSplitter().componentStyleAtWidth(sequence, mouseX - textX);
+        defaultHandleGameClickEvent(event, this.minecraft, this);
+        return true;
     }
 
     private boolean isOverScrollbar(double mouseX, double mouseY) {
@@ -172,48 +171,46 @@ public class LogBookViewScreen extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (button == 0 && this.isOverScrollbar(mouseX, mouseY)) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        if (event.button() == 0 && this.isOverScrollbar(event.x(), event.y())) {
             this.scrollbarGrabbed = true;
 
             int thumbHeight = this.getThumbHeight();
             int thumbY = this.getThumbY(thumbHeight);
 
-            if (mouseY >= thumbY && mouseY < thumbY + thumbHeight) {
-                this.scrollbarDragOffset = mouseY - thumbY;
+            if (event.y() >= thumbY && event.y() < thumbY + thumbHeight) {
+                this.scrollbarDragOffset = event.y() - thumbY;
             } else {
                 this.scrollbarDragOffset = thumbHeight / 2.0;
-                this.setScrollFromThumbY(mouseY - this.scrollbarDragOffset, thumbHeight);
+                this.setScrollFromThumbY(event.y() - this.scrollbarDragOffset, thumbHeight);
             }
             return true;
         }
 
-        int textX = this.leftPos + TEXT_MARGIN_X;
-        int textY = this.topPos + TEXT_MARGIN_Y;
-        Style style = getStyleAt((int) mouseX, (int) mouseY, textX, textY);
-        if (style != null && this.handleComponentClicked(style)) {
+        Style style = this.getStyleAt(event.x(), event.y());
+        if (style != null && this.handleClickEvent(style.getClickEvent())) {
             return true;
         }
 
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+    public boolean mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
         if (this.scrollbarGrabbed) {
             int thumbHeight = this.getThumbHeight();
-            this.setScrollFromThumbY(mouseY - this.scrollbarDragOffset, thumbHeight);
+            this.setScrollFromThumbY(event.y() - this.scrollbarDragOffset, thumbHeight);
             return true;
         }
-        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+        return super.mouseDragged(event, dragX, dragY);
     }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        if (button == 0) {
+    public boolean mouseReleased(MouseButtonEvent event) {
+        if (event.button() == 0) {
             this.scrollbarGrabbed = false;
         }
-        return super.mouseReleased(mouseX, mouseY, button);
+        return super.mouseReleased(event);
     }
 
     @Override
@@ -226,7 +223,8 @@ public class LogBookViewScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    public boolean keyPressed(KeyEvent event) {
+        int keyCode = event.key();
         if (this.maxScroll > 0) {
             if (keyCode == GLFW.GLFW_KEY_UP) {
                 this.scrollAmount = Mth.clamp(this.scrollAmount - LINE_HEIGHT, 0, this.maxScroll);
@@ -245,7 +243,7 @@ public class LogBookViewScreen extends Screen {
                 return true;
             }
         }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        return super.keyPressed(event);
     }
 
     @Override

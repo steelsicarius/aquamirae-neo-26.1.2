@@ -1,20 +1,17 @@
 package dev.obscuria.aquamirae.client.model;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 
-public class ModelShellbackSaddle extends Model {
+public class ModelShellbackSaddle extends Model<Void> {
 
     private final ModelPart root;
 
     public ModelShellbackSaddle(ModelPart root) {
-        super(RenderTypes::entityCutout);
+        super(root, RenderTypes::entityCutout);
         this.root = root.getChild("root");
     }
 
@@ -31,10 +28,5 @@ public class ModelShellbackSaddle extends Model {
     }
 
     @Override
-    public void renderToBuffer(
-            PoseStack poseStack, VertexConsumer vertexConsumer,
-            int packedLight, int packedOverlay, int color
-    ) {
-        this.root.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
-    }
+    public void setupAnim(Void state) {}
 }

@@ -29,7 +29,7 @@ public class ShipbreakerRenderer extends SplineBodyRenderer<ShipbreakerBody, Bod
                 Easing.EASE_OUT_ELASTIC.scale(2f).mergeOut(Easing.EASE_IN_CUBIC, 0.5f)));
         addRenderLayer(SplineBodyRenderer.renderLayer(
                 Aquamirae.id("textures/entity/shipbreaker_overlay.png"),
-                RenderType::eyes,
+                RenderTypes::eyes,
                 32f,
                 0xFFFFFFFF));
         addDecoration(5, new ModelShipbreakerHead(ModelShipbreakerHead.createBodyLayer().bakeRoot()));
@@ -44,7 +44,7 @@ public class ShipbreakerRenderer extends SplineBodyRenderer<ShipbreakerBody, Bod
             MultiBufferSource.BufferSource source,
             float partialTicks
     ) {
-        Vec3 cam = camera.getPosition();
+        Vec3 cam = camera.position();
 
         pose.pushPose();
         pose.translate(-cam.x, -cam.y, -cam.z);

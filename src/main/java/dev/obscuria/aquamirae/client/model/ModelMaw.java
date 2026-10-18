@@ -3,13 +3,12 @@ package dev.obscuria.aquamirae.client.model;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.obscuria.aquamirae.client.animation.AnimPipeline;
 import dev.obscuria.aquamirae.client.animation.AnimPipeline.ContextVar;
-import dev.obscuria.aquamirae.common.entity.Maw;
 import dev.obscuria.fragmentum.v2.api.common.Easing;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 
-public class ModelMaw<T extends Maw> extends AnimatedEntityModel<T> {
+public class ModelMaw extends AnimatedEntityModel<MawRenderState> {
 
     public final ModelPart head, headUpper, headLower;
     public final ModelPart body, body2, body3;
@@ -58,8 +57,8 @@ public class ModelMaw<T extends Maw> extends AnimatedEntityModel<T> {
     }
 
     @Override // @formatter:off
-    protected AnimPipeline<T> createAnimations() {
-        return new AnimPipeline<T>()
+    protected AnimPipeline<MawRenderState> createAnimations() {
+        return new AnimPipeline<MawRenderState>()
                 .resetParts(main, head, headUpper, headLower, body, body2, body3, rightFin, leftFin)
                 .ambientIdle(0.06f, 10f)
                     .keyframe(headUpper, k -> k.rotation(-5, 0, 0, 0, 0, 0, 2, 0))

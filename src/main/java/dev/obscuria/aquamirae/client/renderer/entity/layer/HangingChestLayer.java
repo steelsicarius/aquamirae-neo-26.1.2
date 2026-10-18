@@ -1,35 +1,44 @@
 package dev.obscuria.aquamirae.client.renderer.entity.layer;
 
+import com.google.common.reflect.TypeToken;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import dev.obscuria.aquamirae.client.model.AquamiraeModelLayers;
 import dev.obscuria.aquamirae.client.model.ModelHangingChest;
 import dev.obscuria.aquamirae.common.entity.Shellback;
 import dev.obscuria.aquamirae.common.entity.ShellbackChestType;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.resources.Identifier;
-import com.geckolib.cache.model.GeoBone;
+import net.minecraft.world.entity.Entity;
 import com.geckolib.animatable.GeoAnimatable;
+import com.geckolib.cache.model.GeoBone;
+import com.geckolib.constant.dataticket.DataTicket;
+import com.geckolib.renderer.base.GeoRenderState;
 import com.geckolib.renderer.base.GeoRenderer;
+import com.geckolib.renderer.base.PerBoneRender;
+import com.geckolib.renderer.base.RenderPassInfo;
 import com.geckolib.renderer.layer.GeoRenderLayer;
-import com.geckolib.util.RenderUtil;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
-public class HangingChestLayer<T extends GeoAnimatable> extends GeoRenderLayer<T> {
+public class HangingChestLayer<T extends Entity & GeoAnimatable, R extends GeoRenderState> extends GeoRenderLayer<T, Void, R> {
+
+    private static final DataTicket<Boolean> VISIBLE =
+            DataTicket.create("aquamirae_hanging_chest_visible", new TypeToken<>() {});
 
     private final String boneName;
     private final boolean mirrored;
     private final Predicate<T> visibilityPredicate;
     private final ModelHangingChest model;
 
-    public static <T extends Shellback> HangingChestLayer<T> shellbackChest(
+    public static HangingChestLayer<Shellback, LivingEntityRenderState> shellbackChest(
             EntityRendererProvider.Context context,
-            GeoRenderer<T> entityRendererIn, int index
+            GeoRenderer<Shellback, Void, LivingEntityRenderState> entityRendererIn, int index
     ) {
         var chestType = ShellbackChestType.values()[index];
         return new HangingChestLayer<>(
@@ -40,7 +49,7 @@ public class HangingChestLayer<T extends GeoAnimatable> extends GeoRenderLayer<T
 
     public HangingChestLayer(
             EntityRendererProvider.Context context,
-            GeoRenderer<T> entityRendererIn,
+            GeoRenderer<T, Void, R> entityRendererIn,
             String boneName, boolean mirrored,
             Predicate<T> visibilityPredicate
     ) {
@@ -52,23 +61,29 @@ public class HangingChestLayer<T extends GeoAnimatable> extends GeoRenderLayer<T
     }
 
     @Override
-    public void renderForBone(
-            PoseStack poseStack, T animatable, GeoBone bone, RenderType renderType,
-            MultiBufferSource bufferSource, VertexConsumer buffer, float partialTick,
-            int packedLight, int packedOverlay
-    ) {
-        if (!bone.name().equals(boneName) || !visibilityPredicate.test(animatable)) return;
+    public void addRenderData(T animatable, @Nullable Void relatedObject, R renderState, float partialTick) {
+        renderState.addGeckolibData(VISIBLE, this.visibilityPredicate.test(animatable));
+    }
+
+    @Override
+    public void addPerBoneRender(RenderPassInfo<R> renderPassInfo, BiConsumer<GeoBone, PerBoneRender<R>> consumer) {
+        if (!renderPassInfo.willRender()) return;
+        if (!renderPassInfo.renderState().getOrDefaultGeckolibData(VISIBLE, false)) return;
+
+        renderPassInfo.model().getBone(this.boneName)
+                .ifPresent(bone -> consumer.accept(bone, this::submitForBone));
+    }
+
+    private void submitForBone(RenderPassInfo<R> renderPassInfo, GeoBone bone, SubmitNodeCollector renderTasks) {
+        final PoseStack poseStack = renderPassInfo.poseStack();
 
         poseStack.pushPose();
-        RenderUtil.translateAndRotateMatrixForBone(poseStack, bone);
-        poseStack.mulPose(Axis.YP.rotationDegrees(mirrored ? -90 : 90));
+        poseStack.mulPose(Axis.YP.rotationDegrees(this.mirrored ? -90 : 90));
         poseStack.scale(-0.25f, -0.25f, 0.25f);
-        this.model.renderToBuffer(
-                poseStack, bufferSource.getBuffer(model.renderType(getTexture())),
-                packedLight, packedOverlay, -1);
+        renderTasks.submitModel(this.model, null, poseStack,
+                this.model.renderType(getTexture()),
+                renderPassInfo.packedLight(), renderPassInfo.packedOverlay(), -1, null, null);
         poseStack.popPose();
-
-        bufferSource.getBuffer(renderType);
     }
 
     protected Identifier getTexture() {

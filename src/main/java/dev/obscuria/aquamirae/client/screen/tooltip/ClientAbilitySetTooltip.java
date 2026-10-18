@@ -10,9 +10,10 @@ import dev.obscuria.fragmentum.v2.api.common.richtext.RichText;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
@@ -87,7 +88,7 @@ public class ClientAbilitySetTooltip implements ClientTooltipComponent {
     }
 
     @Override
-    public int getHeight() {
+    public int getHeight(Font font) {
         var height = 14;
 
         for (var tier : bakedTiers)
@@ -122,13 +123,8 @@ public class ClientAbilitySetTooltip implements ClientTooltipComponent {
     }
 
     @Override
-    public void renderImage(
-            Font font,
-            int x,
-            int y,
-            GuiGraphics graphics
-    ) {
-        graphics.drawString(font, title, x, y, 0xFFFFFFFF);
+    public void extractImage(Font font, int x, int y, int width, int height, GuiGraphicsExtractor graphics) {
+        graphics.text(font, title, x, y, 0xFFFFFFFF);
 
         var offset = 14;
 
@@ -137,7 +133,7 @@ public class ClientAbilitySetTooltip implements ClientTooltipComponent {
             var last = index == bakedTiers.size() - 1;
             var nextActive = !last && bakedTiers.get(index + 1).active();
 
-            tier.renderImage(
+            tier.extractImage(
                     texture,
                     font,
                     x,
@@ -249,12 +245,12 @@ public class ClientAbilitySetTooltip implements ClientTooltipComponent {
             descriptionWidth = maxDesc;
         }
 
-        public void renderImage(
+        public void extractImage(
                 Identifier texture,
                 Font font,
                 int x,
                 int y,
-                GuiGraphics graphics,
+                GuiGraphicsExtractor graphics,
                 boolean last,
                 boolean nextActive,
                 int maxNameWidth
@@ -262,7 +258,7 @@ public class ClientAbilitySetTooltip implements ClientTooltipComponent {
             cacheWidths(font);
 
             var nameX = x + maxNameWidth - nameWidth;
-            graphics.drawString(font, name, nameX, y, 0xFFFFFFFF);
+            graphics.text(font, name, nameX, y, 0xFFFFFFFF);
 
             var iconX = x + maxNameWidth;
 
@@ -270,11 +266,12 @@ public class ClientAbilitySetTooltip implements ClientTooltipComponent {
                 var lineHeight = getHeight();
                 var lineTop = y + 3.5f;
 
-                graphics.pose().pushPose();
-                graphics.pose().translate(iconX - 1, lineTop, 0);
-                graphics.pose().scale(1f, lineHeight / 15f, 1f);
+                graphics.pose().pushMatrix();
+                graphics.pose().translate(iconX - 1, lineTop);
+                graphics.pose().scale(1f, lineHeight / 15f);
 
                 graphics.blit(
+                        RenderPipelines.GUI_TEXTURED,
                         texture,
                         0,
                         0,
@@ -286,7 +283,7 @@ public class ClientAbilitySetTooltip implements ClientTooltipComponent {
                         32
                 );
 
-                graphics.pose().popPose();
+                graphics.pose().popMatrix();
 
                 if (progress > 0.0f) {
                     var filledHeight = lineHeight * progress;
@@ -315,11 +312,12 @@ public class ClientAbilitySetTooltip implements ClientTooltipComponent {
                     );
 
                     graphics.disableScissor();
-                    graphics.pose().popPose();
+                    graphics.pose().popMatrix();
                 }
             }
 
             graphics.blit(
+                    RenderPipelines.GUI_TEXTURED,
                     texture,
                     iconX - 1,
                     y - 4,
@@ -335,7 +333,7 @@ public class ClientAbilitySetTooltip implements ClientTooltipComponent {
             var offset = 0;
 
             for (var line : description) {
-                graphics.drawString(
+                graphics.text(
                         font,
                         line,
                         descX,

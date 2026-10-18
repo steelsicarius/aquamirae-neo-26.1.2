@@ -1,7 +1,6 @@
 package dev.obscuria.aquamirae.client.renderer.spline;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.obscuria.aquamirae.common.SplineBody;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
@@ -14,18 +13,21 @@ import org.joml.Vector3f;
 
 import java.util.function.Function;
 
-public abstract class BodyDecoration extends Model {
+public abstract class BodyDecoration extends Model<BodyDecoration.Context> {
 
     private final ModelPart root;
 
     protected BodyDecoration(ModelPart root, Function<Identifier, RenderType> renderType) {
-        super(renderType);
+        super(root, renderType);
         this.root = root;
     }
 
     public abstract Identifier getTexture();
 
     public abstract Identifier getOverlayTexture();
+
+    @Override
+    public void setupAnim(Context state) {}
 
     public void render(
             Context context, PoseStack pose, MultiBufferSource buffer,
@@ -37,14 +39,6 @@ public abstract class BodyDecoration extends Model {
         renderToBuffer(pose, buffer.getBuffer(renderType(getTexture())), packedLight, packedOverlay, -1);
         renderToBuffer(pose, buffer.getBuffer(RenderTypes.eyes(getOverlayTexture())), packedLight, packedOverlay, -1);
         pose.popPose();
-    }
-
-    @Override
-    public void renderToBuffer(
-            PoseStack poseStack, VertexConsumer vertexConsumer,
-            int packedLight, int packedOverlay, int color
-    ) {
-        this.root.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
     }
 
     protected float resolveScale(Context context) {

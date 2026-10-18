@@ -5,10 +5,9 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.obscuria.aquamirae.Aquamirae;
 import dev.obscuria.aquamirae.common.SplineBody;
 import dev.obscuria.fragmentum.v2.api.common.Color;
-import dev.obscuria.fragmentum.v2.api.common.Color;
 import dev.obscuria.fragmentum.v2.api.common.Easing;
 import dev.obscuria.fragmentum.v2.api.common.EasingFunction;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
@@ -31,7 +30,7 @@ import java.util.function.Function;
 
 public abstract class SplineBodyRenderer<T extends SplineBody, D extends BodyDecoration> {
 
-    private static final int MIN_LIGHT = LightTexture.pack(0, 3);
+    private static final int MIN_LIGHT = LightCoordsUtil.pack(0, 3);
 
     protected final Map<Integer, D> decorations = new HashMap<>();
 
@@ -106,7 +105,7 @@ public abstract class SplineBodyRenderer<T extends SplineBody, D extends BodyDec
         BlockPos bp = BlockPos.containing(position.x, isUnshaded ? 999f : position.y, position.z);
         int block = level.getBrightness(LightLayer.BLOCK, bp);
         int sky = level.getBrightness(LightLayer.SKY, bp);
-        return LightTexture.pack(block, sky);
+        return LightCoordsUtil.pack(block, sky);
     }
 
     protected void renderSegment(
@@ -121,7 +120,7 @@ public abstract class SplineBodyRenderer<T extends SplineBody, D extends BodyDec
         Matrix4f transform = pose.last().pose();
         int light1 = Math.max(MIN_LIGHT, packedLightAt(level, first.getPosition()));
         int light2 = Math.max(MIN_LIGHT, packedLightAt(level, second.getPosition()));
-        ARGB white = Color.components(0xFFFFFFFF);
+        Color white = Color.packed(0xFFFFFFFF);
 
         VertexConsumer baseConsumer = buffer.getBuffer(RenderTypes.entitySolid(bodyTexture));
         emitTubeQuads(body, first, second, baseConsumer, transform,
@@ -132,7 +131,7 @@ public abstract class SplineBodyRenderer<T extends SplineBody, D extends BodyDec
         }
 
         for (BodyRenderLayer layer : renderLayers) {
-            ARGB layerColor = Color.components(layer.getColor());
+            Color layerColor = Color.packed(layer.getColor());
             float layerRepeat = layer.getTextureRepeat();
             VertexConsumer layerConsumer = buffer.getBuffer(layer.getRenderType(layer.getTexture()));
             emitTubeQuads(body, first, second, layerConsumer, transform,
@@ -143,9 +142,9 @@ public abstract class SplineBodyRenderer<T extends SplineBody, D extends BodyDec
     private void renderCrestPass(
             SplineBody.BakedRing first, SplineBody.BakedRing second,
             Matrix4f transform, MultiBufferSource buffer,
-            int overlay, int light1, int light2, ARGB color
+            int overlay, int light1, int light2, Color color
     ) {
-        var crestConsumer = buffer.getBuffer(RenderTypes.entityCutoutNoCull(crestVisual.texture()));
+        var crestConsumer = buffer.getBuffer(RenderTypes.entityCutout(crestVisual.texture()));
         emitCrestQuad(first, second, true, crestConsumer, transform, overlay, light1, light2, bodyTextureRepeat, color);
         emitCrestQuad(first, second, false, crestConsumer, transform, overlay, light1, light2, bodyTextureRepeat, color);
     }
@@ -169,7 +168,7 @@ public abstract class SplineBodyRenderer<T extends SplineBody, D extends BodyDec
             boolean top,
             VertexConsumer consumer, Matrix4f transform,
             int overlay, int light1, int light2,
-            float uRepeat, ARGB color
+            float uRepeat, Color color
     ) {
         float fW = widthAt(first.getTween());
         float sW = widthAt(second.getTween());
@@ -218,7 +217,7 @@ public abstract class SplineBodyRenderer<T extends SplineBody, D extends BodyDec
             SplineBody.BakedRing first, SplineBody.BakedRing second,
             VertexConsumer consumer, Matrix4f transform,
             int overlay, int light1, int light2,
-            float uRepeat, ARGB color
+            float uRepeat, Color color
     ) {
         int q = body.ringSegments;
         for (int i1 = 0; i1 < q; i1++) {
@@ -283,7 +282,7 @@ public abstract class SplineBodyRenderer<T extends SplineBody, D extends BodyDec
     private static void emitQuad(
             VertexConsumer c, Matrix4f t, NormalScratch n,
             VertexScratch v, UvScratch uv,
-            int overlay, int light1, int light2, ARGB color
+            int overlay, int light1, int light2, Color color
     ) {
         emitVertex(c, t, n, v.x1, v.y1, v.z1, uv.u1, uv.v1, overlay, light1, color);
         emitVertex(c, t, n, v.x2, v.y2, v.z2, uv.u2, uv.v2, overlay, light2, color);
@@ -294,7 +293,7 @@ public abstract class SplineBodyRenderer<T extends SplineBody, D extends BodyDec
     private static void emitVertex(
             VertexConsumer c, Matrix4f t, NormalScratch n,
             float x, float y, float z, float u, float v,
-            int overlay, int light, ARGB color
+            int overlay, int light, Color color
     ) {
         c.addVertex(t, x, y, z)
                 .setColor(color.decimal())

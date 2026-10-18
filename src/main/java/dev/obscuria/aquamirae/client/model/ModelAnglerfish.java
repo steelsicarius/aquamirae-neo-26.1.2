@@ -1,11 +1,7 @@
 package dev.obscuria.aquamirae.client.model;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Constants;
-import dev.obscuria.aquamirae.client.AquamiraeClient;
 import dev.obscuria.aquamirae.client.animation.AnimPipeline;
-import dev.obscuria.aquamirae.common.entity.Anglerfish;
 import dev.obscuria.fragmentum.v2.api.common.Easing;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
@@ -15,7 +11,7 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.util.Mth;
 
-public class ModelAnglerfish<T extends Anglerfish> extends AnimatedEntityModel<T> {
+public class ModelAnglerfish extends AnimatedEntityModel<AnglerfishRenderState> {
 
     public final ModelPart head, headUpper, headLower, body;
     public final ModelPart tail1, tail2, tail3, tail4, tail5, tail6;
@@ -69,26 +65,18 @@ public class ModelAnglerfish<T extends Anglerfish> extends AnimatedEntityModel<T
         return LayerDefinition.create(meshDefinition, 128, 128);
     }
 
-    @Override
-    public void renderToBuffer(
-            PoseStack poseStack, VertexConsumer vertexConsumer,
-            int packedLight, int packedOverlay, int modulate
-    ) {
-        poseStack.pushPose();
-        poseStack.scale(1.5F, 1.5F, 1.5F);
-        super.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, modulate);
-        poseStack.popPose();
-    }
 
     @Override
-    public void setupAnim(
-            T entity, float limbSwing, float limbSwingAmount,
-            float ageInTicks, float netHeadYaw, float headPitch
-    ) {
-        super.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+    public void setupAnim(AnglerfishRenderState) {
+        float limbSwing = state.walkAnimationPos;
+        float limbSwingAmount = state.walkAnimationSpeed;
+        float ageInTicks = state.ageInTicks;
+        float netHeadYaw = state.yRot;
+        float headPitch = state.xRot;
 
-        float partialTicks = AquamiraeClient.partialTicks();
-        float groundMod = Mth.lerp(partialTicks, entity.clientGroundModO, entity.clientGroundMod);
+        super.setupAnim(state);
+
+        float groundMod = state.groundMod;
         float groundModInv = 1F - groundMod;
 
         this.main.y = 10 * groundMod;
@@ -99,8 +87,8 @@ public class ModelAnglerfish<T extends Anglerfish> extends AnimatedEntityModel<T
     }
 
     @Override // @formatter:off
-    protected AnimPipeline<T> createAnimations() {
-        return new AnimPipeline<T>()
+    protected AnimPipeline<AnglerfishRenderState> createAnimations() {
+        return new AnimPipeline<AnglerfishRenderState>()
                 .resetParts(main, head, headUpper, headLower, body, tail1, tail2, tail3, tail4, tail5, tail6, leftFin, rightFin, lamp1, lamp2, lamp3, lamp4, lamp5)
                 .ambient(AnimPipeline.ContextVar.AGE_IN_TICKS, 0.1f, AnimPipeline.Mod.idle(5), AnimPipeline.Mode.DEFINE)
                     .keyframe(main, k -> k.xRot(1F, -15F))

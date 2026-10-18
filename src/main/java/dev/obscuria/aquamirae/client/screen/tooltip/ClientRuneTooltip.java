@@ -7,7 +7,7 @@ import dev.obscuria.aquamirae.registry.AquamiraeItems;
 import dev.obscuria.fragmentum.v2.api.common.richtext.RichTextOptions;
 import dev.obscuria.fragmentum.v2.api.common.richtext.RichText;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -47,16 +47,16 @@ public record ClientRuneTooltip(
     }
 
     @Override
-    public int getHeight() {
+    public int getHeight(Font font) {
         return Math.max(22, description().size() * 10);
     }
 
     @Override
-    public void renderImage(Font font, int x, int y, GuiGraphics graphics) {
-        graphics.renderItem(icon(), x + 2, y + 2);
+    public void extractImage(Font font, int x, int y, int width, int height, GuiGraphicsExtractor graphics) {
+        graphics.item(icon(), x + 2, y + 2);
         var offset = 0;
         for (var component : description()) {
-            graphics.drawString(font, component, x + 20, y + offset, -1);
+            graphics.text(font, component, x + 20, y + offset, -1);
             offset += 10;
         }
     }
@@ -66,10 +66,10 @@ public record ClientRuneTooltip(
         DAMAGE_DESCRIPTION = Component.translatable("tooltip.aquamirae.rune_damage");
         PROTECTION_DESCRIPTION = Component.translatable("tooltip.aquamirae.rune_protection");
         OPTIONS = RichTextOptions.builder()
-                .withDefaultStyle(RichTextOptions.DESCRIPTION.defaultStyle())
-                .withDefaultPrefix(RichTextOptions.DESCRIPTION.defaultPrefix())
-                .withProcessor(RichTextOptions.DESCRIPTION.processor())
-                .withMaxLineLength(32)
+                .defaultStyle(RichTextOptions.DESCRIPTION.defaultStyle())
+                .defaultPrefix(RichTextOptions.DESCRIPTION.defaultPrefix())
+                .textProcessor(RichTextOptions.DESCRIPTION.textProcessor())
+                .maxLineLength(32)
                 .build();
     }
 }

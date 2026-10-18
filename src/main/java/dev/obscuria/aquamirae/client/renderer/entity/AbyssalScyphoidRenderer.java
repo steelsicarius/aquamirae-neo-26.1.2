@@ -7,21 +7,22 @@ import dev.obscuria.aquamirae.client.renderer.entity.layer.OverlayLayer;
 import dev.obscuria.aquamirae.common.entity.AbyssalScyphoid;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.resources.Identifier;
 
-public class AbyssalScyphoidRenderer<T extends AbyssalScyphoid> extends MobRenderer<T, ModelAbyssalScyphoid<T>> {
+public class AbyssalScyphoidRenderer<T extends AbyssalScyphoid> extends MobRenderer<T, LivingEntityRenderState, ModelAbyssalScyphoid> {
 
     public static final Identifier TEXTURE = Aquamirae.id("textures/entity/abyssal_scyphoid.png");
     public static final Identifier OVERLAY_TEXTURE = Aquamirae.id("textures/entity/abyssal_scyphoid_overlay.png");
 
     public AbyssalScyphoidRenderer(EntityRendererProvider.Context context) {
-        super(context, new ModelAbyssalScyphoid<>(context.bakeLayer(AquamiraeModelLayers.ABYSSAL_SCYPHOID)), 0.25f);
+        super(context, new ModelAbyssalScyphoid(context.bakeLayer(AquamiraeModelLayers.ABYSSAL_SCYPHOID)), 0.25f);
         this.addLayer(new OverlayLayer<>(this, TEXTURE));
         this.addLayer(new OverlayLayer<>(this, OVERLAY_TEXTURE));
     }
 
     @Override
-    public Identifier getTextureLocation(AbyssalScyphoid entity) {
+    public Identifier getTextureLocation(LivingEntityRenderState state) {
         return TEXTURE;
     }
 }

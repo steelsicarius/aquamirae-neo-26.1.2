@@ -32,7 +32,7 @@ public class ModelShipbreakerHead extends BodyDecoration {
 	private final ModelPart bone8;
 
 	public ModelShipbreakerHead(ModelPart root) {
-        super(root, RenderTypes::entityCutoutNoCull);
+        super(root, RenderTypes::entityCutout);
         this.bone = root.getChild("bone");
 		this.bone2 = this.bone.getChild("bone2");
 		this.jaw1 = this.bone.getChild("jaw1");

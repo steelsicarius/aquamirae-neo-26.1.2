@@ -1,31 +1,26 @@
 package dev.obscuria.aquamirae.client.renderer.entity.layer;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.obscuria.aquamirae.client.renderer.AquamiraeArmorRenderer;
 import dev.obscuria.aquamirae.common.item.AquamiraeArmorItem;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import com.geckolib.cache.model.BakedGeoModel;
+import com.geckolib.renderer.GeoArmorRenderer;
+import com.geckolib.renderer.GeoRenderer;
 import com.geckolib.renderer.layer.builtin.AutoGlowingGeoLayer;
+import org.jetbrains.annotations.Nullable;
 
-public class ArmorAutoGlowingLayer extends AutoGlowingGeoLayer<AquamiraeArmorItem> {
+public class ArmorAutoGlowingLayer extends AutoGlowingGeoLayer<AquamiraeArmorItem, GeoArmorRenderer.RenderData, HumanoidRenderState> {
 
-    public ArmorAutoGlowingLayer(AquamiraeArmorRenderer renderer) {
+    private final AquamiraeArmorItem armorItem;
+
+    public ArmorAutoGlowingLayer(GeoRenderer<AquamiraeArmorItem, GeoArmorRenderer.RenderData, HumanoidRenderState> renderer, AquamiraeArmorItem armorItem) {
         super(renderer);
+        this.armorItem = armorItem;
     }
 
     @Override
-    public void render(
-            PoseStack poseStack, AquamiraeArmorItem animatable, BakedGeoModel bakedModel,
-            RenderType renderType, MultiBufferSource bufferSource, VertexConsumer buffer,
-            float partialTick, int packedLight, int packedOverlay
-    ) {
-        if (!animatable.hasGlowingLayer()) return;
-        super.render(
-                poseStack, animatable, bakedModel,
-                renderType, bufferSource, buffer, partialTick,
-                packedLight, packedOverlay);
+    protected @Nullable RenderType getRenderType(HumanoidRenderState renderState) {
+        if (!this.armorItem.hasGlowingLayer()) return null;
+        return super.getRenderType(renderState);
     }
 }

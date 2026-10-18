@@ -1,11 +1,9 @@
 package dev.obscuria.aquamirae.client.model;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import dev.obscuria.aquamirae.common.entity.AbyssalScyphoid;
 import dev.obscuria.fragmentum.v2.api.common.Easing;
 import dev.obscuria.fragmentum.v2.api.common.EasingFunction;
 import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
@@ -13,7 +11,7 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 
-public class ModelAbyssalScyphoid<T extends AbyssalScyphoid> extends EntityModel<T> {
+public class ModelAbyssalScyphoid extends EntityModel<LivingEntityRenderState> {
 
     protected static final EasingFunction MOTION_EASING;
     protected static final EasingFunction SQUISH_EASING;
@@ -29,6 +27,7 @@ public class ModelAbyssalScyphoid<T extends AbyssalScyphoid> extends EntityModel
     protected final ModelPart ten4_1, ten4_2, ten4_3, ten4_4, ten4_5;
 
     public ModelAbyssalScyphoid(ModelPart root) {
+        super(root);
 
         this.main = root.getChild("main");
         this.head = main.getChild("head");
@@ -88,20 +87,16 @@ public class ModelAbyssalScyphoid<T extends AbyssalScyphoid> extends EntityModel
         return LayerDefinition.create(meshDefinition, 64, 64);
     }
 
-    @Override
-    public void renderToBuffer(
-            PoseStack poseStack, VertexConsumer vertexConsumer,
-            int packedLight, int packedOverlay, int modulate
-    ) {
-        this.main.render(poseStack, vertexConsumer, packedLight, packedOverlay, modulate);
-    }
 
     @Override
-    public void setupAnim(
-            T entity, float limbSwing, float limbSwingAmount,
-            float ageInTicks, float netHeadYaw, float headPitch
-    ) {
-        var variant = entity.getScale();
+    public void setupAnim(LivingEntityRenderState) {
+        float limbSwing = state.walkAnimationPos;
+        float limbSwingAmount = state.walkAnimationSpeed;
+        float ageInTicks = state.ageInTicks;
+        float netHeadYaw = state.yRot;
+        float headPitch = state.xRot;
+
+        var variant = state.scale;
         var lifetime = ageInTicks + 1000F * variant;
         var cycle = 20F + 60F * variant;
 

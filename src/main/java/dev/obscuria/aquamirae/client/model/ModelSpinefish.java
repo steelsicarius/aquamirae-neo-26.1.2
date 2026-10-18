@@ -1,19 +1,18 @@
 package dev.obscuria.aquamirae.client.model;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import dev.obscuria.aquamirae.common.entity.Spinefish;
 import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.util.Mth;
 
-public class ModelSpinefish<T extends Spinefish> extends EntityModel<T> {
+public class ModelSpinefish extends EntityModel<LivingEntityRenderState> {
 
     protected final ModelPart main, bodyTop, bodyBottom, head, tail;
 
     public ModelSpinefish(ModelPart root) {
+        super(root);
         this.main = root.getChild("main");
         this.bodyTop = main.getChild("bodyTop");
         this.bodyBottom = main.getChild("bodyBottom");
@@ -36,21 +35,20 @@ public class ModelSpinefish<T extends Spinefish> extends EntityModel<T> {
     }
 
     @Override
-    public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        main.zRot = entity.isInWater() ? 0f : -Mth.PI / 2f;
-        main.y = entity.isInWater() ? 17.5f : 25f;
-        main.x = entity.isInWater() ? 1.5f * Mth.cos(ageInTicks * 0.5f) : 0f;
+    public void setupAnim(LivingEntityRenderState) {
+        float limbSwing = state.walkAnimationPos;
+        float limbSwingAmount = state.walkAnimationSpeed;
+        float ageInTicks = state.ageInTicks;
+        float netHeadYaw = state.yRot;
+        float headPitch = state.xRot;
+
+        main.zRot = state.isInWater ? 0f : -Mth.PI / 2f;
+        main.y = state.isInWater ? 17.5f : 25f;
+        main.x = state.isInWater ? 1.5f * Mth.cos(ageInTicks * 0.5f) : 0f;
         head.yRot = 0.3f * Mth.cos(ageInTicks * 0.5f);
         bodyTop.yRot = 0.15f * Mth.cos(ageInTicks * 0.5f - 0.5f);
         bodyBottom.yRot = -0.15f * Mth.cos(ageInTicks * 0.5f + 0.8f);
         tail.yRot = -0.3f * Mth.cos(ageInTicks * 0.5f + 0.18f);
     }
 
-    @Override
-    public void renderToBuffer(
-            PoseStack poseStack, VertexConsumer vertexConsumer,
-            int packedLight, int packedOverlay, int modulate
-    ) {
-        this.main.render(poseStack, vertexConsumer, packedLight, packedOverlay, modulate);
-    }
 }

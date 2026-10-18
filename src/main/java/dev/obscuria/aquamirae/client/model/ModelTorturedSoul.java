@@ -1,13 +1,12 @@
 package dev.obscuria.aquamirae.client.model;
 
 import dev.obscuria.aquamirae.client.animation.AnimPipeline;
-import dev.obscuria.aquamirae.common.entity.TorturedSoul;
 import dev.obscuria.fragmentum.v2.api.common.Easing;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 
-public class ModelTorturedSoul<T extends TorturedSoul> extends AnimatedEntityModel<T> {
+public class ModelTorturedSoul extends AnimatedEntityModel<TorturedSoulRenderState> {
 
     public final ModelPart body, heart, head, nose;
     public final ModelPart leftArm, rightArm, leftArmLower, rightArmLower;
@@ -51,11 +50,14 @@ public class ModelTorturedSoul<T extends TorturedSoul> extends AnimatedEntityMod
     }
 
     @Override
-    public void setupAnim(
-            T entity, float limbSwing, float limbSwingAmount,
-            float ageInTicks, float netHeadYaw, float headPitch
-    ) {
-        super.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+    public void setupAnim(TorturedSoulRenderState) {
+        float limbSwing = state.walkAnimationPos;
+        float limbSwingAmount = state.walkAnimationSpeed;
+        float ageInTicks = state.ageInTicks;
+        float netHeadYaw = state.yRot;
+        float headPitch = state.xRot;
+
+        super.setupAnim(state);
         this.heart.xRot = ageInTicks / 13f;
         this.heart.yRot = ageInTicks / 9f;
         this.heart.zRot = ageInTicks / 5f;
@@ -64,8 +66,8 @@ public class ModelTorturedSoul<T extends TorturedSoul> extends AnimatedEntityMod
     }
 
     @Override // @formatter:off
-    protected AnimPipeline<T> createAnimations() {
-        return new AnimPipeline<T>()
+    protected AnimPipeline<TorturedSoulRenderState> createAnimations() {
+        return new AnimPipeline<TorturedSoulRenderState>()
                 .resetParts(
                         main, body, heart, head, nose,
                         leftArm, rightArm, leftArmLower, rightArmLower,

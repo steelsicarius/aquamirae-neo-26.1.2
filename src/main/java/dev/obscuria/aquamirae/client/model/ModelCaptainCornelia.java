@@ -2,14 +2,13 @@ package dev.obscuria.aquamirae.client.model;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.obscuria.aquamirae.client.animation.AnimPipeline;
-import dev.obscuria.aquamirae.common.entity.CaptainCorneliaBoss;
 import dev.obscuria.fragmentum.v2.api.common.Easing;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.world.entity.HumanoidArm;
 
-public class ModelCaptainCornelia<T extends CaptainCorneliaBoss> extends AnimatedEntityModel<T> {
+public class ModelCaptainCornelia extends AnimatedEntityModel<CaptainCorneliaRenderState> {
 
     public final ModelPart bodyTop, bodyTop2, bodyBottom, head, rightBooby, leftBooby;
     public final ModelPart rightArm, leftArm, rightLeg, leftLeg, rightArmBottom, leftArmBottom;
@@ -114,11 +113,15 @@ public class ModelCaptainCornelia<T extends CaptainCorneliaBoss> extends Animate
         }
     }
 
-    public void setupAnim(
-            T entity, float limbSwing, float limbSwingAmount,
-            float ageInTicks, float netHeadYaw, float headPitch
-    ) {
-        super.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+    @Override
+    public void setupAnim(CaptainCorneliaRenderState) {
+        float limbSwing = state.walkAnimationPos;
+        float limbSwingAmount = state.walkAnimationSpeed;
+        float ageInTicks = state.ageInTicks;
+        float netHeadYaw = state.yRot;
+        float headPitch = state.xRot;
+
+        super.setupAnim(state);
         var headYaw = (float) Math.toRadians(netHeadYaw) * 0.333f;
         this.head.yRot += headYaw;
         this.bodyTop.yRot += headYaw;
@@ -126,8 +129,8 @@ public class ModelCaptainCornelia<T extends CaptainCorneliaBoss> extends Animate
     }
 
     @Override // @formatter:off
-    protected AnimPipeline<T> createAnimations() {
-        return new AnimPipeline<T>()
+    protected AnimPipeline<CaptainCorneliaRenderState> createAnimations() {
+        return new AnimPipeline<CaptainCorneliaRenderState>()
                 .resetParts(
                         main, bodyTop, bodyTop2, bodyBottom, head, rightBooby, leftBooby,
                         rightArm, leftArm, rightLeg, leftLeg, rightArmBottom, leftArmBottom,

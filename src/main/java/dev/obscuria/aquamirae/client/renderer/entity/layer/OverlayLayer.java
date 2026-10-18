@@ -1,24 +1,24 @@
 package dev.obscuria.aquamirae.client.renderer.entity.layer;
 
 import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.EyesLayer;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.entity.Entity;
 
-public class OverlayLayer<T extends Entity, M extends EntityModel<T>> extends EyesLayer<T, M> {
+public class OverlayLayer<S extends EntityRenderState, M extends EntityModel<S>> extends EyesLayer<S, M> {
 
     private final RenderType renderType;
 
-    public OverlayLayer(RenderLayerParent<T, M> parent, Identifier texture) {
+    public OverlayLayer(RenderLayerParent<S, M> parent, Identifier texture) {
         super(parent);
         this.renderType = RenderTypes.eyes(texture);
     }
 
     @Override
     public RenderType renderType() {
-        return renderType;
+        return this.renderType;
     }
 }

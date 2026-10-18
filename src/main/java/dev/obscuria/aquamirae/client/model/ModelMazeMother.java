@@ -1,15 +1,11 @@
 package dev.obscuria.aquamirae.client.model;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import dev.obscuria.aquamirae.client.AquamiraeClient;
 import dev.obscuria.aquamirae.client.animation.AnimPipeline;
-import dev.obscuria.aquamirae.common.entity.MazeMother;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 
-public class ModelMazeMother<T extends MazeMother> extends AnimatedEntityModel<T> {
+public class ModelMazeMother extends AnimatedEntityModel<MazeMotherRenderState> {
 
     public final ModelPart root2, bodyTop, bodyBottom;
     public final ModelPart tail1, tail2, tail3, tail4, tail5;
@@ -88,25 +84,17 @@ public class ModelMazeMother<T extends MazeMother> extends AnimatedEntityModel<T
         return LayerDefinition.create(meshDefinition, 128, 128);
     }
 
-    @Override
-    public void renderToBuffer(
-            PoseStack poseStack, VertexConsumer vertexConsumer,
-            int packedLight, int packedOverlay, int modulate
-    ) {
-        poseStack.pushPose();
-        poseStack.scale(5f, 5f, 5f);
-        poseStack.translate(0F, -1F, 0F);
-        super.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, modulate);
-        poseStack.popPose();
-    }
 
     @Override
-    public void setupAnim(
-            T entity, float limbSwing, float limbSwingAmount,
-            float ageInTicks, float netHeadYaw, float headPitch
-    ) {
-        super.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
-        var verticalMotion = entity.getVerticalMotion(AquamiraeClient.partialTicks());
+    public void setupAnim(MazeMotherRenderState) {
+        float limbSwing = state.walkAnimationPos;
+        float limbSwingAmount = state.walkAnimationSpeed;
+        float ageInTicks = state.ageInTicks;
+        float netHeadYaw = state.yRot;
+        float headPitch = state.xRot;
+
+        super.setupAnim(state);
+        var verticalMotion = state.verticalMotion;
         this.tail1.xRot -= verticalMotion * 0.2f;
         this.tail2.xRot -= verticalMotion * 0.4f;
         this.tail3.xRot -= verticalMotion * 0.6f;
@@ -123,8 +111,8 @@ public class ModelMazeMother<T extends MazeMother> extends AnimatedEntityModel<T
     }
 
     @Override // @formatter:off
-	protected AnimPipeline<T> createAnimations() {
-		return new AnimPipeline<T>()
+	protected AnimPipeline<MazeMotherRenderState> createAnimations() {
+		return new AnimPipeline<MazeMotherRenderState>()
 				.resetParts(
 						main, root2, bodyTop, bodyBottom,
 						tail1, tail2, tail3, tail4, tail5,

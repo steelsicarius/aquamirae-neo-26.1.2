@@ -1,24 +1,33 @@
 package dev.obscuria.aquamirae.client.renderer.entity.layer;
 
+import com.google.common.reflect.TypeToken;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.obscuria.aquamirae.Aquamirae;
 import dev.obscuria.aquamirae.client.model.AquamiraeModelLayers;
 import dev.obscuria.aquamirae.client.model.ModelShellbackSaddle;
 import dev.obscuria.aquamirae.common.entity.Shellback;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.resources.Identifier;
+import com.geckolib.animatable.GeoAnimatable;
 import com.geckolib.cache.model.GeoBone;
+import com.geckolib.constant.dataticket.DataTicket;
+import com.geckolib.renderer.base.GeoRenderState;
 import com.geckolib.renderer.base.GeoRenderer;
+import com.geckolib.renderer.base.PerBoneRender;
+import com.geckolib.renderer.base.RenderPassInfo;
 import com.geckolib.renderer.layer.GeoRenderLayer;
-import com.geckolib.util.RenderUtil;
+import org.jetbrains.annotations.Nullable;
 
-public class ShellbackSaddleLayer<T extends Shellback> extends GeoRenderLayer<T> {
+import java.util.function.BiConsumer;
 
-    public static final Identifier TEXTURE;
+public class ShellbackSaddleLayer<T extends Shellback & GeoAnimatable, R extends GeoRenderState> extends GeoRenderLayer<T, Void, R> {
+
+    private static final DataTicket<Integer> SADDLE_COUNT =
+            DataTicket.create("aquamirae_shellback_saddle_count", new TypeToken<>() {});
+
+    public static final Identifier TEXTURE = Aquamirae.id("textures/entity/shellback_saddle.png");
 
     protected final String boneName;
     protected final int requiredAmount;
@@ -26,7 +35,7 @@ public class ShellbackSaddleLayer<T extends Shellback> extends GeoRenderLayer<T>
 
     public ShellbackSaddleLayer(
             EntityRendererProvider.Context context,
-            GeoRenderer<T> entityRendererIn,
+            GeoRenderer<T, Void, R> entityRendererIn,
             boolean mainSaddle
     ) {
         super(entityRendererIn);
@@ -36,26 +45,27 @@ public class ShellbackSaddleLayer<T extends Shellback> extends GeoRenderLayer<T>
     }
 
     @Override
-    public void renderForBone(
-            PoseStack poseStack, T animatable, GeoBone bone, RenderType renderType,
-            MultiBufferSource bufferSource, VertexConsumer buffer, float partialTick,
-            int packedLight, int packedOverlay
-    ) {
-        if (!bone.name().equals(boneName)) return;
-        if (animatable.getSaddleCount() < requiredAmount) return;
-
-        poseStack.pushPose();
-        RenderUtil.translateAndRotateMatrixForBone(poseStack, bone);
-        poseStack.scale(-0.25f, -0.25f, 0.25f);
-        this.model.renderToBuffer(
-                poseStack, bufferSource.getBuffer(model.renderType(TEXTURE)),
-                packedLight, packedOverlay, -1);
-        poseStack.popPose();
-
-        bufferSource.getBuffer(renderType);
+    public void addRenderData(T animatable, @Nullable Void relatedObject, R renderState, float partialTick) {
+        renderState.addGeckolibData(SADDLE_COUNT, animatable.getSaddleCount());
     }
 
-    static {
-        TEXTURE = Aquamirae.id("textures/entity/shellback_saddle.png");
+    @Override
+    public void addPerBoneRender(RenderPassInfo<R> renderPassInfo, BiConsumer<GeoBone, PerBoneRender<R>> consumer) {
+        if (!renderPassInfo.willRender()) return;
+        if (renderPassInfo.renderState().getOrDefaultGeckolibData(SADDLE_COUNT, 0) < this.requiredAmount) return;
+
+        renderPassInfo.model().getBone(this.boneName)
+                .ifPresent(bone -> consumer.accept(bone, this::submitForBone));
+    }
+
+    private void submitForBone(RenderPassInfo<R> renderPassInfo, GeoBone bone, SubmitNodeCollector renderTasks) {
+        final PoseStack poseStack = renderPassInfo.poseStack();
+
+        poseStack.pushPose();
+        poseStack.scale(-0.25f, -0.25f, 0.25f);
+        renderTasks.submitModel(this.model, null, poseStack,
+                this.model.renderType(TEXTURE),
+                renderPassInfo.packedLight(), renderPassInfo.packedOverlay(), -1, null, null);
+        poseStack.popPose();
     }
 }

@@ -1,15 +1,12 @@
 package dev.obscuria.aquamirae.client.model;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.obscuria.aquamirae.client.animation.AnimPipeline;
-import dev.obscuria.aquamirae.common.entity.Eel;
 import dev.obscuria.fragmentum.v2.api.common.Easing;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 
-public class ModelEel<T extends Eel> extends AnimatedEntityModel<T> {
+public class ModelEel extends AnimatedEntityModel<EelRenderState> {
 
     public final ModelPart body1, body2, body3, body4, body5, body6, body7, body8, body9, body10;
     public final ModelPart head, headUpper, headLower, leftFin, rightFin;
@@ -81,26 +78,19 @@ public class ModelEel<T extends Eel> extends AnimatedEntityModel<T> {
         return LayerDefinition.create(meshDefinition, 256, 256);
     }
 
-    @Override
-    public void renderToBuffer(
-            PoseStack poseStack, VertexConsumer vertexConsumer,
-            int packedLight, int packedOverlay, int modulate
-    ) {
-        poseStack.pushPose();
-        poseStack.scale(1.8f, 1.8f, 1.8f);
-        poseStack.translate(0F, -0.7F, 0F);
-        super.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, modulate);
-        poseStack.popPose();
-    }
 
     @Override
-    public void setupAnim(
-            T entity, float limbSwing, float limbSwingAmount,
-            float ageInTicks, float netHeadYaw, float headPitch
-    ) {
-        super.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+    public void setupAnim(EelRenderState) {
+        float limbSwing = state.walkAnimationPos;
+        float limbSwingAmount = state.walkAnimationSpeed;
+        float ageInTicks = state.ageInTicks;
+        float netHeadYaw = state.yRot;
+        float headPitch = state.xRot;
+
+        super.setupAnim(state);
         applyBodyRotation((float) Math.toRadians(netHeadYaw) * 0.1f);
-        this.main.visible = !(entity.digState.getTick() >= 24 && entity.digState.getTick() <= 70);
+        var digTick = state.digState.getTick();
+        this.main.visible = !(digTick >= 24 && digTick <= 70);
     }
 
     protected void applyBodyRotation(float rotation) {
@@ -117,8 +107,8 @@ public class ModelEel<T extends Eel> extends AnimatedEntityModel<T> {
     }
 
     @Override // @formatter:off
-    protected AnimPipeline<T> createAnimations() {
-        return new AnimPipeline<T>()
+    protected AnimPipeline<EelRenderState> createAnimations() {
+        return new AnimPipeline<EelRenderState>()
                 .resetParts(
                         main, body1, body2, body3, body4, body5, body6, body7, body8, body9, body10,
                         head, headUpper, headLower, leftFin, rightFin)

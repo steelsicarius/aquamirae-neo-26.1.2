@@ -4,7 +4,6 @@ import dev.obscuria.aquamirae.client.AquamiraeClient;
 import dev.obscuria.aquamirae.common.entity.animation.AnimState;
 import dev.obscuria.fragmentum.v2.api.common.EasingFunction;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.world.entity.Entity;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -13,7 +12,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public final class AnimPipeline<E extends Entity> {
+public final class AnimPipeline<E> {
 
     public record Context(
             float limbSwing,
@@ -339,7 +338,7 @@ public final class AnimPipeline<E extends Entity> {
         }
     }
 
-    private static final class ClipLayer<E extends Entity> {
+    private static final class ClipLayer<E> {
 
         private final Function<E, AnimState> stateExtractor;
         private final int fadeInTicks;

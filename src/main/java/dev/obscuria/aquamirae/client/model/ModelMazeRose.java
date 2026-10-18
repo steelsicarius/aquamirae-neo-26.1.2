@@ -2,17 +2,18 @@ package dev.obscuria.aquamirae.client.model;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import dev.obscuria.aquamirae.common.entity.projectile.MazeRose;
 import net.minecraft.client.model.EntityModel;
+import dev.obscuria.aquamirae.client.renderer.entity.state.MazeRoseRenderState;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 
-public class ModelMazeRose<T extends MazeRose> extends EntityModel<T> {
+public class ModelMazeRose extends EntityModel<MazeRoseRenderState> {
 
 	public final ModelPart main;
 
 	public ModelMazeRose(ModelPart root) {
+        super(root);
 		this.main = root.getChild("maze_rose");
 	}
 
