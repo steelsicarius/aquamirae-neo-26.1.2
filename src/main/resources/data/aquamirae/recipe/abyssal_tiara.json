@@ -7,8 +7,8 @@
     "   "
   ],
   "key": {
-    "0": { "item": "minecraft:totem_of_undying" },
-    "1": { "item": "aquamirae:abyssal_amethyst" }
+    "0": "minecraft:totem_of_undying",
+    "1": "aquamirae:abyssal_amethyst"
   },
   "result": {
     "id": "aquamirae:abyssal_tiara",

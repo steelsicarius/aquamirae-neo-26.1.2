@@ -6,11 +6,11 @@
     " 0 "
   ],
   "key": {
-    "0": { "item": "minecraft:bowl" },
-    "1": { "item": "aquamirae:cooked_spinefish" },
-    "2": { "item": "aquamirae:esca" },
-    "3": { "item": "aquamirae:jellyfish_jelly" },
-    "4": { "item": "aquamirae:void_squid" }
+    "0": "minecraft:bowl",
+    "1": "aquamirae:cooked_spinefish",
+    "2": "aquamirae:esca",
+    "3": "aquamirae:jellyfish_jelly",
+    "4": "aquamirae:void_squid"
   },
   "result": {
     "id": "aquamirae:poseidon_breakfast",

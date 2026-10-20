@@ -7,9 +7,9 @@
     "212"
   ],
   "key": {
-    "0": { "item": "aquamirae:terrible_upgrade_smithing_template" },
-    "1": { "item": "aquamirae:angler_fang" },
-    "2": { "item": "aquamirae:fin" }
+    "0": "aquamirae:terrible_upgrade_smithing_template",
+    "1": "aquamirae:angler_fang",
+    "2": "aquamirae:fin"
   },
   "result": {
     "id": "aquamirae:terrible_upgrade_smithing_template",

@@ -6,10 +6,10 @@
     "03 "
   ],
   "key": {
-    "0": { "item": "minecraft:stick" },
-    "1": { "item": "aquamirae:wisteria_niveis" },
-    "2": { "item": "aquamirae:esca" },
-    "3": { "item": "aquamirae:oxyhelium" }
+    "0": "minecraft:stick",
+    "1": "aquamirae:wisteria_niveis",
+    "2": "aquamirae:esca",
+    "3": "aquamirae:oxyhelium"
   },
   "result": {
     "id": "aquamirae:esca_skewer",

@@ -7,9 +7,9 @@
     "212"
   ],
   "key": {
-    "0": { "item": "aquamirae:terrible_upgrade_smithing_template" },
-    "1": { "item": "aquamirae:abyssal_amethyst" },
-    "2": { "item": "aquamirae:ship_graveyard_echo" }
+    "0": "aquamirae:terrible_upgrade_smithing_template",
+    "1": "aquamirae:abyssal_amethyst",
+    "2": "aquamirae:ship_graveyard_echo"
   },
   "result": {
     "id": "aquamirae:abyssal_upgrade_smithing_template",

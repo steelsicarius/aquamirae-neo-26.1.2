@@ -3,9 +3,7 @@
   "group": "bonemeal",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "aquamirae:remnant_saber"
-    }
+    "aquamirae:remnant_saber"
   ],
   "result": {
     "id": "minecraft:bone_meal",

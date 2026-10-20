@@ -3,9 +3,7 @@
   "group": "bonemeal",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "aquamirae:angler_fang"
-    }
+    "aquamirae:angler_fang"
   ],
   "result": {
     "id": "minecraft:bone_meal",

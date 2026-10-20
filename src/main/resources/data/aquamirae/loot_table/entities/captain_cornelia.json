@@ -23,6 +23,7 @@
               "function": "enchant_with_levels",
               "treasure": true,
               "levels": {
+                "type": "minecraft:uniform",
                 "min": 10,
                 "max": 30
               }
@@ -33,6 +34,7 @@
     },
     {
       "rolls": {
+        "type": "minecraft:uniform",
         "min": 6,
         "max": 10
       },

@@ -6,10 +6,10 @@
     " 0 "
   ],
   "key": {
-    "0": { "item": "minecraft:bowl" },
-    "1": { "item": "aquamirae:cooked_spinefish" },
-    "2": { "item": "aquamirae:fin" },
-    "3": { "item": "aquamirae:oxyhelium" }
+    "0": "minecraft:bowl",
+    "1": "aquamirae:cooked_spinefish",
+    "2": "aquamirae:fin",
+    "3": "aquamirae:oxyhelium"
   },
   "result": {
     "id": "aquamirae:sea_stew",

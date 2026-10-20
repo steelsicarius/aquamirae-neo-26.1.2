@@ -8,9 +8,9 @@
     " 2 "
   ],
   "key": {
-    "0": { "item": "aquamirae:esca" },
-    "1": { "item": "aquamirae:oxyhelium" },
-    "2": { "item": "minecraft:stick" }
+    "0": "aquamirae:esca",
+    "1": "aquamirae:oxyhelium",
+    "2": "minecraft:stick"
   },
   "result": {
     "id": "aquamirae:luminescent_lamp",

@@ -7,9 +7,9 @@
     "0  "
   ],
   "key": {
-    "0": { "item": "minecraft:stick" },
-    "1": { "item": "aquamirae:sharp_bones" },
-    "2": { "item": "minecraft:string" }
+    "0": "minecraft:stick",
+    "1": "aquamirae:sharp_bones",
+    "2": "minecraft:string"
   },
   "result": {
     "id": "aquamirae:remnant_saber",

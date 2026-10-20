@@ -7,10 +7,10 @@
     "03 "
   ],
   "key": {
-    "0": { "item": "minecraft:stick" },
-    "1": { "item": "minecraft:diamond" },
-    "2": { "item": "aquamirae:abyssal_amethyst" },
-    "3": { "item": "aquamirae:ship_graveyard_echo" }
+    "0": "minecraft:stick",
+    "1": "minecraft:diamond",
+    "2": "aquamirae:abyssal_amethyst",
+    "3": "aquamirae:ship_graveyard_echo"
   },
   "result": {
     "id": "aquamirae:shatterspike",

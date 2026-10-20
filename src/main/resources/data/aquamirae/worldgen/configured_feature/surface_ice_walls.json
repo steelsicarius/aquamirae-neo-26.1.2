@@ -3,12 +3,14 @@
   "config": {
     "biome_mask": "aquamirae:ice_maze",
     "ground_mask": {
+      "type": "minecraft:uniform",
       "noise": "aquamirae:ice_walls",
       "min": 0.48,
       "max": 1.0
     },
     "wall_layer_1_height": 5,
     "wall_layer_1": {
+      "type": "minecraft:uniform",
       "noise": "aquamirae:ice_walls",
       "easing": "ease_in_expo",
       "min": 0.5,
@@ -16,6 +18,7 @@
     },
     "wall_layer_2_height": 14,
     "wall_layer_2": {
+      "type": "minecraft:uniform",
       "noise": "aquamirae:ice_walls",
       "easing": "ease_in_out_cubic",
       "min": 0.68,

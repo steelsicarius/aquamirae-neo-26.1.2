@@ -8,8 +8,8 @@
     " 1 "
   ],
   "key": {
-    "0": { "item": "aquamirae:esca" },
-    "1": { "item": "aquamirae:oxyhelium" }
+    "0": "aquamirae:esca",
+    "1": "aquamirae:oxyhelium"
   },
   "result": {
     "id": "aquamirae:luminescent_bubble",

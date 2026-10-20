@@ -3,6 +3,7 @@
   "pools": [
     {
       "rolls": {
+        "type": "minecraft:uniform",
         "min": 4,
         "max": 6
       },
@@ -15,6 +16,7 @@
             {
               "function": "set_count",
               "count": {
+                "type": "minecraft:uniform",
                 "min": 8,
                 "max": 16
               }
@@ -29,6 +31,7 @@
             {
               "function": "set_count",
               "count": {
+                "type": "minecraft:uniform",
                 "min": 12,
                 "max": 24
               }
@@ -43,6 +46,7 @@
             {
               "function": "set_count",
               "count": {
+                "type": "minecraft:uniform",
                 "min": 8,
                 "max": 16
               }
@@ -57,6 +61,7 @@
             {
               "function": "set_count",
               "count": {
+                "type": "minecraft:uniform",
                 "min": 2,
                 "max": 6
               }
@@ -71,6 +76,7 @@
             {
               "function": "set_count",
               "count": {
+                "type": "minecraft:uniform",
                 "min": 2,
                 "max": 6
               }

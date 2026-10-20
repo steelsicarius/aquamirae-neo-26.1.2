@@ -7,10 +7,10 @@
     "02 "
   ],
   "key": {
-    "0": { "item": "minecraft:stick" },
-    "1": { "item": "minecraft:iron_ingot" },
-    "2": { "item": "aquamirae:fin" },
-    "3": { "item": "aquamirae:esca" }
+    "0": "minecraft:stick",
+    "1": "minecraft:iron_ingot",
+    "2": "aquamirae:fin",
+    "3": "aquamirae:esca"
   },
   "result": {
     "id": "aquamirae:terrible_blade",

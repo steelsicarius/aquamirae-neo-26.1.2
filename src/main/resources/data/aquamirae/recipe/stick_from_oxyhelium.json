@@ -3,9 +3,7 @@
   "group": "sticks",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "aquamirae:oxyhelium"
-    }
+    "aquamirae:oxyhelium"
   ],
   "result": {
     "id": "minecraft:stick",

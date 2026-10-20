@@ -3,9 +3,7 @@
   "group": "bonemeal",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "aquamirae:sharp_bones"
-    }
+    "aquamirae:sharp_bones"
   ],
   "result": {
     "id": "minecraft:bone_meal",

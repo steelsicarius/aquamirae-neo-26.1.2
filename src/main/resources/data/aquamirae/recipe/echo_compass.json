@@ -6,8 +6,8 @@
     " 1 "
   ],
   "key": {
-    "0": { "item": "minecraft:compass" },
-    "1": { "item": "aquamirae:ship_graveyard_echo" }
+    "0": "minecraft:compass",
+    "1": "aquamirae:ship_graveyard_echo"
   },
   "result": {
     "id": "aquamirae:echo_compass",

@@ -7,10 +7,10 @@
     "023"
   ],
   "key": {
-    "0": { "item": "minecraft:stick" },
-    "1": { "item": "aquamirae:maelstrom_vestige" },
-    "2": { "item": "aquamirae:abyssal_amethyst" },
-    "3": { "item": "aquamirae:ship_graveyard_echo" }
+    "0": "minecraft:stick",
+    "1": "aquamirae:maelstrom_vestige",
+    "2": "aquamirae:abyssal_amethyst",
+    "3": "aquamirae:ship_graveyard_echo"
   },
   "result": {
     "id": "aquamirae:dreadwake",
