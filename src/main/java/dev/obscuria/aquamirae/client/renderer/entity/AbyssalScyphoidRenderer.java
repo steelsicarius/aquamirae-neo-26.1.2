@@ -25,4 +25,9 @@ public class AbyssalScyphoidRenderer<T extends AbyssalScyphoid> extends MobRende
     public Identifier getTextureLocation(LivingEntityRenderState state) {
         return TEXTURE;
     }
+
+    @Override
+    public LivingEntityRenderState createRenderState() {
+        return new LivingEntityRenderState();
+    }
 }

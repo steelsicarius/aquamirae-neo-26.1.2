@@ -106,7 +106,7 @@ public class ShellHornItem extends Item {
                 } else {
                     var difficulty = level.getCurrentDifficultyAt(summonAt);
                     var captainCornelia = new CaptainCorneliaBoss(AquamiraeEntityTypes.CAPTAIN_CORNELIA.get(), level);
-                    captainCornelia.moveTo(summonAt.getCenter());
+                    captainCornelia.snapTo(summonAt.getCenter());
                     captainCornelia.finalizeSpawn(level, difficulty, EntitySpawnReason.MOB_SUMMONED, null);
                     level.addFreshEntity(captainCornelia);
                     summoner.sendSystemMessage(FEEDBACK_SUMMON_CAPTAIN_CORNELIA.copy().withStyle(ChatFormatting.LIGHT_PURPLE));

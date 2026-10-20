@@ -83,17 +83,17 @@ public final class AquamiraeEntityTypes {
     static void init() {
         var registrar = AquamiraeRegistries.REGISTRAR;
 
-        registrar.registerAttributes(SCUTTLER, Mob::createMobAttributes);
-        registrar.registerAttributes(SHELLBACK, Mob::createMobAttributes);
-        registrar.registerAttributes(GOLDEN_MOTH, GoldenMoth::createAttributes);
-        registrar.registerAttributes(MAW, Monster::createMonsterAttributes);
-        registrar.registerAttributes(SPINEFISH, Mob::createMobAttributes);
-        registrar.registerAttributes(ABYSSAL_SCYPHOID, Mob::createMobAttributes);
-        registrar.registerAttributes(ANGLERFISH, Monster::createMonsterAttributes);
-        registrar.registerAttributes(MAZE_MOTHER, Monster::createMonsterAttributes);
-        registrar.registerAttributes(CAPTAIN_CORNELIA, Monster::createMonsterAttributes);
-        registrar.registerAttributes(EEL, Monster::createMonsterAttributes);
-        registrar.registerAttributes(TORTURED_SOUL, Monster::createMonsterAttributes);
+        registrar.registerAttributes(SCUTTLER, Mob.createMobAttributes());
+        registrar.registerAttributes(SHELLBACK, Mob.createMobAttributes());
+        registrar.registerAttributes(GOLDEN_MOTH, GoldenMoth.createAttributes());
+        registrar.registerAttributes(MAW, Monster.createMonsterAttributes());
+        registrar.registerAttributes(SPINEFISH, Mob.createMobAttributes());
+        registrar.registerAttributes(ABYSSAL_SCYPHOID, Mob.createMobAttributes());
+        registrar.registerAttributes(ANGLERFISH, Monster.createMonsterAttributes());
+        registrar.registerAttributes(MAZE_MOTHER, Monster.createMonsterAttributes());
+        registrar.registerAttributes(CAPTAIN_CORNELIA, Monster.createMonsterAttributes());
+        registrar.registerAttributes(EEL, Monster.createMonsterAttributes());
+        registrar.registerAttributes(TORTURED_SOUL, Monster.createMonsterAttributes());
 
         // MC 26.1.2 / Fragmentum v4: Registrar#registerSpawnPlacement is gone.
         // Spawn placements for the entities below must be registered through

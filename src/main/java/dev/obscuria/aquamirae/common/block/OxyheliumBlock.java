@@ -63,8 +63,9 @@ public class OxyheliumBlock extends Block implements SimpleWaterloggedBlock {
                 .setValue(TYPE, Type.STEM));
     }
 
+    // MC 26.1.2: propagatesSkylightDown(BlockState, BlockGetter, BlockPos) -> (BlockState)
     @Override
-    public boolean propagatesSkylightDown(BlockState state, BlockGetter reader, BlockPos pos) {
+    public boolean propagatesSkylightDown(BlockState state) {
         return state.getFluidState().isEmpty();
     }
 
@@ -99,7 +100,7 @@ if (state.getValue(WATERLOGGED)) ticks.scheduleTick(currentPos, Fluids.WATER, Fl
             BlockState state, Level level, BlockPos pos,
             Block neighborBlock, Orientation orientation, boolean movedByPiston
     ) {
-        super.neighborChanged(state, level, pos, neighborBlock, fromPos, moving);
+        super.neighborChanged(state, level, pos, neighborBlock, orientation, movedByPiston);
         var aboveState = level.getBlockState(pos.above());
         if (aboveState.canOcclude()) return;
         if (aboveState.hasProperty(TYPE) && aboveState.getValue(TYPE) == Type.STEM) return;
@@ -141,8 +142,10 @@ if (state.getValue(WATERLOGGED)) ticks.scheduleTick(currentPos, Fluids.WATER, Fl
             useRareBud(state, level, pos, entity);
     }
 
+    // MC 26.1.2: entityInside gained an InsideBlockEffectApplier and an isPrecise flag.
     @Override
-    public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+    public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity,
+                             net.minecraft.world.entity.InsideBlockEffectApplier effectApplier, boolean isPrecise) {
         if (entity instanceof LivingEntity living && state.getValue(TYPE) == Type.BUD)
             useBud(state, level, pos, living);
         else if (entity instanceof LivingEntity living && state.getValue(TYPE) == Type.RARE_BUD)

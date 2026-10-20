@@ -19,7 +19,7 @@ public abstract class MixinStructureTemplate {
 
     @Inject(method = "load", at = @At("TAIL"))
     private void load$onTail(HolderGetter<Block> level, CompoundTag tag, CallbackInfo info) {
-        if (!tag.getBoolean(TAG_IGNORE_LIQUIDS)) return;
+        if (!tag.getBooleanOr(TAG_IGNORE_LIQUIDS, false)) return;
         this.aquamirae$ignoreLiquids = true;
     }
 

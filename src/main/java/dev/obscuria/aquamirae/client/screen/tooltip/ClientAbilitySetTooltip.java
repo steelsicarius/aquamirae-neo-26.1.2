@@ -192,8 +192,8 @@ public class ClientAbilitySetTooltip implements ClientTooltipComponent {
                             ability.getFormattedDescription(entity, active),
                             null,
                             RichTextOptions.builder()
-                                    .withMaxLineLength(32)
-                                    .withDefaultStyle(style)
+                                    .maxLineLength(32)
+                                    .defaultStyle(style)
                                     .build()
                     ),
                     active,
@@ -288,9 +288,9 @@ public class ClientAbilitySetTooltip implements ClientTooltipComponent {
                 if (progress > 0.0f) {
                     var filledHeight = lineHeight * progress;
 
-                    graphics.pose().pushPose();
-                    graphics.pose().translate(iconX - 1, lineTop, 0);
-                    graphics.pose().scale(1f, lineHeight / 15f, 1f);
+                    graphics.pose().pushMatrix();
+                    graphics.pose().translate(iconX - 1, lineTop);
+                    graphics.pose().scale(1f, lineHeight / 15f);
 
                     graphics.enableScissor(
                             iconX - 1,

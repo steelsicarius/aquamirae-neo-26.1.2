@@ -55,9 +55,9 @@ public abstract class MixinPlayer extends LivingEntity implements ExtensionPlaye
 
     @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
     private void readAdditionalSaveData$onTail(CompoundTag compound, CallbackInfo ci) {
-        var aquamiraeData = compound.getCompound("AquamiraeData");
-        if (aquamiraeData.contains("RemnantSaberBonus", Tag.TAG_FLOAT))
-            aquamirae$setRemnantSaberBonus(aquamiraeData.getFloat("RemnantSaberBonus"));
+        var aquamiraeData = compound.getCompoundOrEmpty("AquamiraeData");
+        aquamiraeData.getFloat("RemnantSaberBonus")
+                .ifPresent(this::aquamirae$setRemnantSaberBonus);
     }
 
     @Inject(method = "actuallyHurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;gameEvent(Lnet/minecraft/core/Holder;)V"))

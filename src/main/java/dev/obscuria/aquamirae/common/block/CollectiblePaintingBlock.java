@@ -62,8 +62,9 @@ public class CollectiblePaintingBlock extends Block implements SimpleWaterlogged
 //        list.add(Component.translatable(getDescriptionId() + ".desc").withStyle(ChatFormatting.GRAY));
 //    }
 
+    // MC 26.1.2: propagatesSkylightDown(BlockState, BlockGetter, BlockPos) -> (BlockState)
     @Override
-    public boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) {
+    public boolean propagatesSkylightDown(BlockState state) {
         return state.getFluidState().isEmpty();
     }
 

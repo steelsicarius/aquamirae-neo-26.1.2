@@ -242,7 +242,6 @@ public final class CommonConfig {
         ENABLE_MAZE_MOTHER_SPAWNING = builder.define("enable_maze_mother_spawning", true);
         MAZE_MOTHER_SPAWN_CHANCE = builder.defineDouble("maze_mother_spawn_chance", 0.005, 0, 1);
 
-        VALUES = builder.collectValues();
-        builder.buildCommon(Aquamirae.MOD_ID);
+        VALUES = builder.buildCommon(Aquamirae.MOD_ID);
     }
 }

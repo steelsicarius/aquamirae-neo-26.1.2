@@ -35,7 +35,8 @@ public final class AbilityHelper {
     }
 
     public static <T> void forEachCapability(Class<T> ofType, LivingEntity self, Consumer<T> consumer) {
-        AquamiraeRegistries.ABILITY_SET.holders().forEach(abilitySet -> {
+        // MC 26.1.2: Registry.holders() was removed; iterate values and wrap.
+        AquamiraeRegistries.ABILITY_SET.stream().map(AquamiraeRegistries.ABILITY_SET::wrapAsHolder).forEach(abilitySet -> {
             forEachActiveAbility(abilitySet, self, ability -> {
                 if (ofType.isInstance(ability)) {
                     consumer.accept(ofType.cast(ability));
@@ -46,7 +47,7 @@ public final class AbilityHelper {
 
     public static void animateCritEffect(LivingEntity attacker, LivingEntity victim) {
         if (victim.level() instanceof ServerLevel level) {
-            level.getChunkSource().broadcastAndSend(attacker, new ClientboundAnimatePacket(victim, 4));
+            level.getChunkSource().sendToTrackingPlayersAndSelf(attacker, new ClientboundAnimatePacket(victim, 4));
             level.playSound(null, victim, SoundEvents.PLAYER_ATTACK_CRIT, SoundSource.HOSTILE, 1f, 1f);
         } else {
             AquamiraeClient.animateCritEffect(victim);

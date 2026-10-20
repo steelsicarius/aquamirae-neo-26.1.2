@@ -16,8 +16,6 @@ import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.neoforged.neoforge.common.world.ModifiableBiomeInfo;
 
-import java.util.List;
-
 public record NeoBiomePatcher(
         ModifiableBiomeInfo.BiomeInfo.Builder builder,
         Registry<ConfiguredWorldCarver<?>> configuredCarvers,
@@ -27,14 +25,22 @@ public record NeoBiomePatcher(
     public static NeoBiomePatcher create(ModifiableBiomeInfo.BiomeInfo.Builder builder) {
         var registryAccess = FragmentumProxy.registryAccess();
         return new NeoBiomePatcher(builder,
-                registryAccess.registryOrThrow(Registries.CONFIGURED_CARVER),
-                registryAccess.registryOrThrow(Registries.PLACED_FEATURE));
+                registryAccess.lookupOrThrow(Registries.CONFIGURED_CARVER),
+                registryAccess.lookupOrThrow(Registries.PLACED_FEATURE));
     }
 
+    /**
+     * MC 26.1.2: spawners live in immutable-backed WeightedList builders, so
+     * the map entries are replaced with fresh empty builders (the only way to
+     * clear them). NeoForge's access transformers make the builder maps
+     * public, so no reflection is required.
+     */
     @Override
     public void clearSpawns() {
-        this.builder.getMobSpawnSettings().spawners.values().forEach(List::clear);
-        this.builder.getMobSpawnSettings().mobSpawnCosts.clear();
+        var spawnSettings = this.builder.getMobSpawnSettings();
+        spawnSettings.mobSpawnCosts.clear();
+        for (var category : MobCategory.values())
+            spawnSettings.spawners.put(category, net.minecraft.util.random.WeightedList.builder());
     }
 
     /**
@@ -43,17 +49,17 @@ public record NeoBiomePatcher(
      */
     @Override
     public void addCarver(ResourceKey<ConfiguredWorldCarver<?>> carverKey) {
-        this.builder.getGenerationSettings().addCarver(configuredCarvers.getHolderOrThrow(carverKey));
+        this.builder.getGenerationSettings().addCarver(configuredCarvers.getOrThrow(carverKey));
     }
 
     @Override
     public void addFeature(GenerationStep.Decoration step, ResourceKey<PlacedFeature> placedFeatureKey) {
-        this.builder.getGenerationSettings().addFeature(step, placedFeatures.getHolderOrThrow(placedFeatureKey));
+        this.builder.getGenerationSettings().addFeature(step, placedFeatures.getOrThrow(placedFeatureKey));
     }
 
     @Override
-    public void addSpawn(MobCategory spawnGroup, MobSpawnSettings.SpawnerData spawnEntry) {
-        this.builder.getMobSpawnSettings().addSpawn(spawnGroup, spawnEntry);
+    public void addSpawn(MobCategory spawnGroup, net.minecraft.util.random.Weighted<MobSpawnSettings.SpawnerData> spawnEntry) {
+        this.builder.getMobSpawnSettings().addSpawn(spawnGroup, spawnEntry.weight(), spawnEntry.value());
     }
 
     @Override

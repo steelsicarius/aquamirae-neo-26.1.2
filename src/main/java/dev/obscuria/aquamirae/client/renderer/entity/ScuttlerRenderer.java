@@ -51,7 +51,7 @@ public class ScuttlerRenderer extends GeoEntityRenderer<Scuttler, ScuttlerRender
         super.addRenderData(animatable, relatedObject, renderState, partialTick);
         MathParser.setVariable(
                 AquamiraeClient.MOLANG_SCUTTLER_WALK,
-                () -> renderState.walkAnimationPos * 0.25);
+                state -> renderState.walkAnimationPos * 0.25);
     }
 
     @Override

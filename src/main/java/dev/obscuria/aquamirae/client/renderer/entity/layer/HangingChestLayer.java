@@ -82,7 +82,7 @@ public class HangingChestLayer<T extends Entity & GeoAnimatable, R extends GeoRe
         poseStack.scale(-0.25f, -0.25f, 0.25f);
         renderTasks.submitModel(this.model, null, poseStack,
                 this.model.renderType(getTexture()),
-                renderPassInfo.packedLight(), renderPassInfo.packedOverlay(), -1, null, null);
+                renderPassInfo.packedLight(), renderPassInfo.packedOverlay(), -1, null, -1, null);
         poseStack.popPose();
     }
 

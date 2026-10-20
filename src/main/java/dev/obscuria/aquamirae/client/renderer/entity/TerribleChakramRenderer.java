@@ -48,7 +48,7 @@ public class TerribleChakramRenderer<T extends TerribleChakram> extends EntityRe
         pose.translate(0.0F, -1.501F, 0.0F);
         this.model.setupAnim(state);
         renderTasks.submitModel(this.model, state, pose, this.model.renderType(TEXTURE),
-                state.lightCoords, OverlayTexture.NO_OVERLAY, -1, null, null);
+                state.lightCoords, OverlayTexture.NO_OVERLAY, -1, null, -1, null);
         pose.popPose();
     }
 }

@@ -156,13 +156,13 @@ public class ShellbackInventory implements Container {
         }
 
         @Override
-        public void startOpen(Player player) {
+        public void startOpen(net.minecraft.world.entity.ContainerUser user) {
             part.playSound(SoundEvents.CHEST_OPEN);
             owner.onChestOpen();
         }
 
         @Override
-        public void stopOpen(Player player) {
+        public void stopOpen(net.minecraft.world.entity.ContainerUser user) {
             part.playSound(SoundEvents.CHEST_CLOSE);
             owner.onChestClose();
         }

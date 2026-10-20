@@ -30,6 +30,6 @@ public abstract class MixinLecternBlock {
         if (!book.is(AquamiraeItems.LOGBOOK.asItem())) return;
         if (player instanceof ServerPlayer serverPlayer)
             FragmentumNetworking.sendTo(serverPlayer, new ClientboundLogBookOpenPayload(book));
-        cir.setReturnValue(InteractionResult.sidedSuccess(level.isClientSide()));
+        cir.setReturnValue(InteractionResult.SUCCESS);
     }
 }

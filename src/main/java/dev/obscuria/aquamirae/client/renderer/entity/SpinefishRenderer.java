@@ -21,4 +21,9 @@ public class SpinefishRenderer<T extends Spinefish> extends MobRenderer<T, Livin
     public Identifier getTextureLocation(LivingEntityRenderState state) {
         return TEXTURE;
     }
+
+    @Override
+    public LivingEntityRenderState createRenderState() {
+        return new LivingEntityRenderState();
+    }
 }

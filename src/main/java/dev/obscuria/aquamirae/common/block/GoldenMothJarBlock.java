@@ -48,8 +48,9 @@ public class GoldenMothJarBlock extends Block implements SimpleWaterloggedBlock 
         registerDefaultState(stateDefinition.any().setValue(WATERLOGGED, false));
     }
 
+    // MC 26.1.2: propagatesSkylightDown(BlockState, BlockGetter, BlockPos) -> (BlockState)
     @Override
-    public boolean propagatesSkylightDown(BlockState state, @NotNull BlockGetter reader, @NotNull BlockPos pos) {
+    public boolean propagatesSkylightDown(BlockState state) {
         return state.getFluidState().isEmpty();
     }
 
@@ -93,7 +94,8 @@ if (state.getValue(WATERLOGGED)) ticks.scheduleTick(currentPos, Fluids.WATER, Fl
         if (level instanceof ServerLevel serverLevel) {
             @Nullable var goldenMoth = AquamiraeEntityTypes.GOLDEN_MOTH.get().create(serverLevel, EntitySpawnReason.MOB_SUMMONED);
             if (goldenMoth == null) return;
-            goldenMoth.moveTo(pos.getCenter().add(0, -0.2, 0));
+            // MC 26.1.2: Entity.moveTo was renamed to snapTo.
+            goldenMoth.snapTo(pos.getCenter().add(0, -0.2, 0));
             goldenMoth.setPersistenceRequired();
             var difficulty = serverLevel.getCurrentDifficultyAt(goldenMoth.blockPosition());
             goldenMoth.finalizeSpawn(serverLevel, difficulty, EntitySpawnReason.MOB_SUMMONED, null);

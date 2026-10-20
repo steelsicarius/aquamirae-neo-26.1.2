@@ -41,8 +41,9 @@ public class AquamiraeSmithingTemplateItem extends SmithingTemplateItem {
             List<Identifier> additionalSlotEmptyIcons,
             Properties properties
     ) {
+        // MC 26.1.2: the upgradeDescription parameter was removed.
         super(
-                appliesTo, ingredients, upgradeDescription, baseSlotDescription,
+                appliesTo, ingredients, baseSlotDescription,
                 additionsSlotDescription, baseSlotEmptyIcons,
                 additionalSlotEmptyIcons, properties);
     }

@@ -51,7 +51,7 @@ public class ShellbackChestPart extends SubPartEntity<Shellback> {
 
         if (!level().isClientSide()) {
             getParent().setChest(chestIndex, true);
-            playSound(SoundEvents.ARMOR_EQUIP_IRON.value().value());
+            playSound(SoundEvents.ARMOR_EQUIP_IRON.value());
             if (!player.getAbilities().instabuild) {
                 stack.shrink(1);
             }
@@ -119,18 +119,15 @@ public class ShellbackChestPart extends SubPartEntity<Shellback> {
         return Items.CHEST.getDefaultInstance();
     }
 
+    // MC 26.1.2: Entity.isInvulnerableTo was removed; the check is folded
+    // into the server-side damage entry point instead.
     @Override
     public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
-        if (isInvulnerableTo(source)) {
+        if (getParent().hasChest(chestIndex)) {
             playSound(SoundEvents.SHIELD_BLOCK.value());
             return false;
         }
         return getParent().hurtServer(level, source, amount);
-    }
-
-    @Override
-    public boolean isInvulnerableTo(DamageSource source) {
-        return getParent().hasChest(chestIndex);
     }
 
     @Override

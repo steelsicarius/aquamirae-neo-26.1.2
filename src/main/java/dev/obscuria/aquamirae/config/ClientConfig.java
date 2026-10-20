@@ -37,7 +37,6 @@ public final class ClientConfig {
         BLIZZARD_WIND_OFFSET = builder.defineDouble("blizzard_wind_offset", 10, 0, 100);
         BLIZZARD_SPEED_MULTIPLIER = builder.defineDouble("blizzard_speed_multiplier", 20, 0, 100);
 
-        VALUES = builder.collectValues();
-        builder.buildClient(Aquamirae.MOD_ID);
+        VALUES = builder.buildClient(Aquamirae.MOD_ID);
     }
 }

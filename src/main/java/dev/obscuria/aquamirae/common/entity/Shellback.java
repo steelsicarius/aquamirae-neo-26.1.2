@@ -37,7 +37,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.pathfinder.PathType;
@@ -314,7 +314,7 @@ public class Shellback extends TamableAnimal implements MultipartEntity, GeoEnti
     }
 
     @Override
-    public boolean canBeCollidedWith() {
+    public boolean canBeCollidedWith(Entity other) {
         return true;
     }
 
@@ -496,8 +496,10 @@ public class Shellback extends TamableAnimal implements MultipartEntity, GeoEnti
 
     private void floatOnWater() {
         if (this.isInWater()) {
-            var fluid = this.level().getFluidState(this.blockPosition());
-            if (ctx.isAbove(LiquidBlock.STABLE_SHAPE, this.blockPosition(), true)
+            CollisionContext ctx = CollisionContext.of(this);
+            // MC 26.1.2: LiquidBlock.STABLE_SHAPE was replaced by the per-entity
+            // liquid collision shape (LivingEntity.getLiquidCollisionShape).
+            if (ctx.isAbove(this.getLiquidCollisionShape(), this.blockPosition(), true)
                     && !this.level().getFluidState(this.blockPosition().above()).is(FluidTags.WATER)) {
                 this.setOnGround(true);
             } else {

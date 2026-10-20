@@ -22,7 +22,11 @@ public interface BiomePatcher {
 
     void addFeature(GenerationStep.Decoration step, ResourceKey<PlacedFeature> placedFeatureKey);
 
-    void addSpawn(MobCategory spawnGroup, MobSpawnSettings.SpawnerData spawnEntry);
+    /**
+     * MC 26.1.2: biome spawners are weight-aware (WeightedList); the weight
+     * travels with the entry.
+     */
+    void addSpawn(MobCategory spawnGroup, net.minecraft.util.random.Weighted<MobSpawnSettings.SpawnerData> spawnEntry);
 
     void setPrecipitation(boolean hasPrecipitation);
 

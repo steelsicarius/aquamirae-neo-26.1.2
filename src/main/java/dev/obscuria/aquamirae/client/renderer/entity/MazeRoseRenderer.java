@@ -50,9 +50,9 @@ public class MazeRoseRenderer<T extends MazeRose> extends EntityRenderer<T, Maze
         pose.translate(0.0F, -1.501F, 0.0F);
         this.model.setupAnim(state);
         renderTasks.submitModel(this.model, state, pose, this.model.renderType(TEXTURE),
-                state.lightCoords, OverlayTexture.NO_OVERLAY, -1, null, null);
+                state.lightCoords, OverlayTexture.NO_OVERLAY, -1, null, -1, null);
         renderTasks.submitModel(this.model, state, pose, RenderTypes.eyes(OVERLAY_TEXTURE),
-                state.lightCoords, OverlayTexture.NO_OVERLAY, -1, null, null);
+                state.lightCoords, OverlayTexture.NO_OVERLAY, -1, null, -1, null);
         pose.popPose();
     }
 }

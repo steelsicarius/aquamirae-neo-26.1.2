@@ -31,11 +31,10 @@ import java.util.Optional;
 public class RuneSmithingRecipe implements SmithingRecipe {
 
     public static final RuneSmithingRecipe SHARED = new RuneSmithingRecipe();
-    public static final RecipeSerializer<RuneSmithingRecipe> SERIALIZER =
-            new RecipeSerializer<>(CODEC, STREAM_CODEC);
-
     private static final MapCodec<RuneSmithingRecipe> CODEC = MapCodec.unit(SHARED);
     private static final StreamCodec<RegistryFriendlyByteBuf, RuneSmithingRecipe> STREAM_CODEC = StreamCodec.unit(SHARED);
+    public static final RecipeSerializer<RuneSmithingRecipe> SERIALIZER =
+            new RecipeSerializer<>(CODEC, STREAM_CODEC);
 
     @Override
     public boolean matches(SmithingRecipeInput input, Level level) {

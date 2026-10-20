@@ -28,7 +28,7 @@ public class AbstractChakram extends Projectile {
     }
 
     @Override
-    public boolean canBeCollidedWith() {
+    public boolean canBeCollidedWith(Entity other) {
         return false;
     }
 

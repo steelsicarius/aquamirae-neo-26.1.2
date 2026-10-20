@@ -267,7 +267,7 @@ public final class ConfigScreenBuilder {
         public static OptionSpec<String> sound(ConfigValue<String> value) {
             return opt(value).controller(o -> DropdownStringControllerBuilder.create(o)
                     .values(BuiltInRegistries.SOUND_EVENT.stream()
-                            .map(SoundEvent::getLocation)
+                            .map(SoundEvent::location)
                             .map(Identifier::toString)
                             .toList()));
         }
@@ -297,7 +297,7 @@ public final class ConfigScreenBuilder {
                                 .sorted(),
                         biomeLookup.listElements()
                                 .map(Holder.Reference::key)
-                                .map(ResourceKey::location)
+                                .map(ResourceKey::identifier)
                                 .map(Identifier::toString)
                                 .sorted()
                 ).toList());
@@ -314,7 +314,7 @@ public final class ConfigScreenBuilder {
         }
 
         public static ListOptionSpec<String> itemTagList(ConfigValue<List<? extends String>> value) {
-            return dropdownList(value, () -> BuiltInRegistries.ITEM.getTagNames()
+            return dropdownList(value, () -> BuiltInRegistries.ITEM.listTagIds()
                     .map(TagKey::location)
                     .map(Identifier::toString)
                     .sorted()
@@ -365,7 +365,7 @@ public final class ConfigScreenBuilder {
         public static LabelOption missingConfigHint() {
             return LabelOption.create(translate("label.missing_config_hint",
                     Component.literal("Obscuria Collection").withStyle(style -> style
-                            .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://dsc.gg/obscuria"))
+                            .withClickEvent(new ClickEvent.OpenUrl(java.net.URI.create("https://dsc.gg/obscuria")))
                             .withColor(ChatFormatting.BLUE)
                             .withUnderlined(true))
             ).withStyle(ChatFormatting.GRAY));

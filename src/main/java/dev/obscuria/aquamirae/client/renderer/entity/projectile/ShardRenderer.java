@@ -44,7 +44,7 @@ public abstract class ShardRenderer<T extends AbstractShard, S extends ShardRend
         this.model.setupAnim(state);
         source.submitModel(this.model, state, pose,
                 RenderTypes.eyes(getTextureLocation(state)),
-                state.lightCoords, OverlayTexture.NO_OVERLAY, CommonColors.WHITE, null, null);
+                state.lightCoords, OverlayTexture.NO_OVERLAY, CommonColors.WHITE, null, -1, null);
         pose.popPose();
     }
 

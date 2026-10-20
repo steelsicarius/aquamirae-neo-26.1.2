@@ -26,6 +26,11 @@ public class Spinefish extends AbstractSchoolingFish {
     }
 
     @Override
+    public ItemStack getBucketItemStack() {
+        return Items.AIR.getDefaultInstance();
+    }
+
+    @Override
     protected SoundEvent getAmbientSound() {
         return SoundEvents.COD_AMBIENT;
     }

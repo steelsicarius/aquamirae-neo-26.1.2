@@ -37,6 +37,11 @@ public final class EchoCompassAngle extends NeedleDirectionHelper implements Ran
     }
 
     @Override
+    public MapCodec<? extends RangeSelectItemModelProperty> type() {
+        return MAP_CODEC;
+    }
+
+    @Override
     protected float calculate(ItemStack itemStack, ClientLevel level, int seed, ItemOwner owner) {
         @Nullable GlobalPos target = itemStack.get(AquamiraeDataComponents.ECHO_TRACKER);
         long gameTime = level.getGameTime();
