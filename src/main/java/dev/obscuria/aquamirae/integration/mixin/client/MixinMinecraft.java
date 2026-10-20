@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Minecraft.class)
 public abstract class MixinMinecraft {
 
-    @Inject(method = "setLevel(Lnet/minecraft/client/ClientLevel;)V", at = @At("HEAD"))
+    @Inject(method = "setLevel(Lnet/minecraft/client/multiplayer/ClientLevel;)V", at = @At("HEAD"))
     private void setLevel$onHead(ClientLevel level, CallbackInfo ci) {
         HookMinecraft.onSetLevel((Minecraft) (Object) this);
     }

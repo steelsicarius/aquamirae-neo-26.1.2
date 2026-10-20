@@ -22,7 +22,7 @@ public abstract class MixinLogoRenderer {
     @WrapOperation(
             method = "extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IFI)V",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blit(Lnet/minecraft/client/renderer/rendertype/RenderPipeline;Lnet/minecraft/resources/Identifier;IIFFIIIII)V",
+                    target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blit(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIFFIIIII)V",
                     ordinal = 0)
     )
     private void extractRenderState$modifyLogoBlit(

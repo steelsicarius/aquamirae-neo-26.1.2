@@ -22,8 +22,8 @@ public abstract class MixinGuiRenderer {
             method = "render(Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V",
             at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/render/GuiRenderer;cubeMap:Lnet/minecraft/client/renderer/CubeMap;"))
     private CubeMap aquamirae$modifyPanorama(CubeMap original) {
-        return EarlyConfig.THEMED_MAIN_MENU.get()
-                ? AquamiraeClient.PANORAMA
-                : original;
+        if (!EarlyConfig.THEMED_MAIN_MENU.get()) return original;
+        var panorama = AquamiraeClient.panorama();
+        return panorama != null ? panorama : original;
     }
 }

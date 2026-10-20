@@ -26,6 +26,8 @@ base {
 }
 
 repositories {
+    mavenCentral() // LWJGL natives-linux-arm64 (no estan en libraries.minecraft.net)
+
     // Obscuria collection maven (Fragmentum)
     maven {
         name = 'Obscuria'
@@ -62,6 +64,10 @@ neoForge {
         client {
             client()
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            // aarch64 workaround: the LWJGL arm64 libopenal requires
+            // GLIBCXX_3.4.30 (host has 3.4.29); use the EL9 openal-soft build
+            // bundled in lib/aarch64 instead (see comment near arm64NativesDir).
+            systemProperty 'org.lwjgl.openal.libname', file('lib/aarch64/libopenal.so.1.24.2').absolutePath
         }
 
         server {
@@ -101,7 +107,19 @@ configurations {
     runtimeClasspath.extendsFrom localRuntime
 }
 
+// ---------------------------------------------------------------------------
+// aarch64 workaround: the vanilla 26.1.2 version manifest only declares the
+// x64 'natives-linux' artifacts for Linux (Mojang ships no linux/arm64 rule
+// variant), so LWJGL resolves to x64 jars on this aarch64 host and the dev
+// client cannot start. The arm64 natives in lib/natives-linux-arm64 (fetched
+// once from Maven Central, since libraries.minecraft.net does not host them)
+// are added to the runtime classpath: LWJGL 3.4 selects the architecture
+// matching the JVM among the natives jars it finds on the classpath.
+def arm64NativesDir = fileTree('lib/natives-linux-arm64')
+
 dependencies {
+    runtimeOnly arm64NativesDir
+
     // Obscuria's Fragmentum framework
     implementation "dev.obscuria:fragmentum-neoforge:${fragmentum_version}"
 

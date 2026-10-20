@@ -41,11 +41,29 @@ public final class AquamiraeClient {
     /**
      * MC 26.1.2: PanoramaRenderer was replaced by CubeMap, which the GuiRenderer
      * renders from a fixed vanilla field; MixinGuiRenderer swaps that field for
-     * this one when the themed main menu is enabled.
+     * this one when the themed main menu is enabled. CubeMap's constructor now
+     * allocates GPU buffers, so the instance is created lazily (the device is
+     * not available during mod construction).
      */
-    public static final CubeMap PANORAMA = new CubeMap(Aquamirae.id("textures/gui/title/panorama"));
+    private static CubeMap panorama;
     public static final Identifier PIRATE_PILLAGER_TEXTURE;
     public static final Identifier PIRATE_VINDICATOR_TEXTURE;
+
+    /**
+     * Creates and registers the themed panorama alongside vanilla's own
+     * (GameRenderer#registerPanoramaTextures runs after the GPU device is up
+     * and before any title render, so the textures upload with the rest).
+     */
+    public static void initPanorama(net.minecraft.client.renderer.texture.TextureManager textureManager) {
+        if (panorama == null) {
+            panorama = new CubeMap(Aquamirae.id("textures/gui/title/panorama"));
+            panorama.registerTextures(textureManager);
+        }
+    }
+
+    public static CubeMap panorama() {
+        return panorama;
+    }
 
     public static float partialTicks() {
         return Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
@@ -67,7 +85,6 @@ public final class AquamiraeClient {
     public static void init() {
 
         ClientConfig.init();
-        PANORAMA.registerTextures(Minecraft.getInstance().getTextureManager());
         var registrar = FragmentumClientRegistry.registrar(Aquamirae.MOD_ID);
 
         TooltipComponentRegistry.register(AbilitySetTooltip.class, ClientAbilitySetTooltip::create);
