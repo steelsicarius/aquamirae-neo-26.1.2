@@ -53,7 +53,7 @@ public record KeepsakeArmor(
         CODEC = RecordCodecBuilder.create(builder -> builder.group(
                 Codec.STRING.fieldOf("nickname").forGetter(KeepsakeArmor::nickname),
                 Codec.STRING.optionalFieldOf("lore").forGetter(KeepsakeArmor::lore),
-                Color.decimalCodec().optionalFieldOf("dyed_color").forGetter(KeepsakeArmor::dyedColor),
+                Color.codec().optionalFieldOf("dyed_color").forGetter(KeepsakeArmor::dyedColor),
                 ArmorTrimConfig.CODEC.optionalFieldOf("armor_trim").forGetter(KeepsakeArmor::armorTrim),
                 EnchantmentConfig.CODEC.optionalFieldOf("enchantments").forGetter(KeepsakeArmor::enchantments),
                 ItemConfig.CODEC.listOf().fieldOf("items").forGetter(KeepsakeArmor::items)
@@ -135,7 +135,7 @@ public record KeepsakeArmor(
                     BuiltInRegistries.ITEM.byNameCodec().fieldOf("item").forGetter(ItemConfig::item),
                     Codec.STRING.fieldOf("name").forGetter(ItemConfig::name),
                     Codec.STRING.optionalFieldOf("lore").forGetter(ItemConfig::loreOverride),
-                    Color.decimalCodec().optionalFieldOf("dyed_color").forGetter(ItemConfig::dyedColorOverride),
+                    Color.codec().optionalFieldOf("dyed_color").forGetter(ItemConfig::dyedColorOverride),
                     ArmorTrimConfig.CODEC.optionalFieldOf("armor_trim").forGetter(ItemConfig::armorTrimOverride),
                     EnchantmentConfig.CODEC.optionalFieldOf("enchantments").forGetter(ItemConfig::enchantmentOverride),
                     ConfiguredAttribute.CODEC.listOf().fieldOf("attributes").forGetter(ItemConfig::attributes)
