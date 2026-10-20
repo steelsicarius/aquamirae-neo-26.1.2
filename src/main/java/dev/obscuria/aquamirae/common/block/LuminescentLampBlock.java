@@ -30,13 +30,8 @@ public class LuminescentLampBlock extends Block implements SimpleWaterloggedBloc
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     private static final VoxelShape SHAPE = box(5, 0, 5, 11, 32, 11);
 
-    public LuminescentLampBlock() {
-        super(Properties.of()
-                .mapColor(MapColor.WOOD)
-                .sound(SoundType.WOOD)
-                .strength(1.4f, 6f)
-                .lightLevel(s -> 15)
-                .noOcclusion());
+    public LuminescentLampBlock(Properties properties) {
+        super(properties);
         this.registerDefaultState(stateDefinition.any().setValue(WATERLOGGED, false));
     }
 

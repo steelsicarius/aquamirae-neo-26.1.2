@@ -36,15 +36,8 @@ public class GoldenMothJarBlock extends Block implements SimpleWaterloggedBlock 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     private static final VoxelShape SHAPE;
 
-    public GoldenMothJarBlock() {
-        super(Properties.of()
-                .strength(1f, 10f)
-                .mapColor(MapColor.GOLD)
-                .sound(SoundType.GLASS)
-                .lightLevel(s -> 8)
-                .requiresCorrectToolForDrops()
-                .noOcclusion()
-                .noLootTable());
+    public GoldenMothJarBlock(Properties properties) {
+        super(properties);
         registerDefaultState(stateDefinition.any().setValue(WATERLOGGED, false));
     }
 

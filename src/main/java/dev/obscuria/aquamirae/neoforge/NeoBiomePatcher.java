@@ -1,7 +1,7 @@
 package dev.obscuria.aquamirae.neoforge;
 
 import dev.obscuria.aquamirae.common.region.BiomePatcher;
-import dev.obscuria.fragmentum.v2.api.FragmentumProxy;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -23,7 +23,11 @@ public record NeoBiomePatcher(
 ) implements BiomePatcher {
 
     public static NeoBiomePatcher create(ModifiableBiomeInfo.BiomeInfo.Builder builder) {
-        var registryAccess = FragmentumProxy.registryAccess();
+        // MC 26.1.2: Fragmentum's server proxy is populated only after
+        // initServer returns (vanilla moved buildServerStatus behind
+        // initServer), so the biome modifier phase reads the registry
+        // access from NeoForge's current server instead.
+        var registryAccess = ServerLifecycleHooks.getCurrentServer().registryAccess();
         return new NeoBiomePatcher(builder,
                 registryAccess.lookupOrThrow(Registries.CONFIGURED_CARVER),
                 registryAccess.lookupOrThrow(Registries.PLACED_FEATURE));

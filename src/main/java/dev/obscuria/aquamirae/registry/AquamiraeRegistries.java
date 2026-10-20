@@ -32,6 +32,7 @@ public final class AquamiraeRegistries {
         AquamiraeAttributes.init();
         AquamiraeEffects.init();
         AquamiraeDataComponents.init();
+        AquamiraeAttachments.init();
         AquamiraeEntityTypes.init();
         AquamiraeBlocks.init();
         AquamiraeArmorMaterials.init();

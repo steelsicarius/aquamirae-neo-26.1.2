@@ -52,7 +52,7 @@ public class AquamiraeSmithingTemplateItem extends SmithingTemplateItem {
         return new Item.Properties().component(AquamiraeDataComponents.TOOLTIP, TOOLTIP);
     }
 
-    public static AquamiraeSmithingTemplateItem createTerribleUpgradeTemplate() {
+    public static AquamiraeSmithingTemplateItem createTerribleUpgradeTemplate(Item.Properties properties) {
         return new AquamiraeSmithingTemplateItem(
                 TERRIBLE_APPLIES_TO, TERRIBLE_INGREDIENTS, TERRIBLE_DESCRIPTION,
                 TERRIBLE_BASE_SLOT_DESCRIPTION, TERRIBLE_ADDITIONS_SLOT_DESCRIPTION,
@@ -61,10 +61,10 @@ public class AquamiraeSmithingTemplateItem extends SmithingTemplateItem {
                         Identifier.withDefaultNamespace("item/empty_armor_slot_leggings"),
                         Identifier.withDefaultNamespace("item/empty_armor_slot_boots")),
                 List.of(Identifier.withDefaultNamespace("item/empty_slot_amethyst_shard")),
-                properties());
+                properties.component(AquamiraeDataComponents.TOOLTIP, TOOLTIP));
     }
 
-    public static AquamiraeSmithingTemplateItem createAbyssalUpgradeTemplate() {
+    public static AquamiraeSmithingTemplateItem createAbyssalUpgradeTemplate(Item.Properties properties) {
         return new AquamiraeSmithingTemplateItem(
                 ABYSSAL_APPLIES_TO, ABYSSAL_INGREDIENTS, ABYSSAL_DESCRIPTION,
                 ABYSSAL_BASE_SLOT_DESCRIPTION, ABYSSAL_ADDITIONS_SLOT_DESCRIPTION,
@@ -73,6 +73,6 @@ public class AquamiraeSmithingTemplateItem extends SmithingTemplateItem {
                         Identifier.withDefaultNamespace("item/empty_armor_slot_leggings"),
                         Identifier.withDefaultNamespace("item/empty_armor_slot_boots")),
                 List.of(Identifier.withDefaultNamespace("item/empty_slot_amethyst_shard")),
-                properties());
+                properties.component(AquamiraeDataComponents.TOOLTIP, TOOLTIP));
     }
 }

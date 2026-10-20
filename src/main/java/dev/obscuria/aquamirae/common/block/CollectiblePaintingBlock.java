@@ -39,19 +39,8 @@ public class CollectiblePaintingBlock extends Block implements SimpleWaterlogged
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     private static final Map<Direction, VoxelShape> SHAPES;
 
-    public CollectiblePaintingBlock() {
-        super(Properties.of()
-                .strength(1f)
-                .requiresCorrectToolForDrops()
-                .mapColor(MapColor.WOOD)
-                .sound(new SoundType(1.0f, 1.0f,
-                        SoundEvents.PAINTING_BREAK,
-                        SoundEvents.WOOL_STEP,
-                        SoundEvents.PAINTING_PLACE,
-                        SoundEvents.WOOD_HIT,
-                        SoundEvents.WOOD_FALL))
-                .noCollision()
-                .noOcclusion());
+    public CollectiblePaintingBlock(Properties properties) {
+        super(properties);
         registerDefaultState(this.stateDefinition.any()
                 .setValue(FACING, Direction.NORTH)
                 .setValue(WATERLOGGED, false));

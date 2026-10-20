@@ -6,7 +6,7 @@ import dev.obscuria.aquamirae.client.CameraShake;
 
 public final class HookGameRenderer {
 
-    public static void bobView(PoseStack poseStack, float partialTicks) {
+    public static void bobView(PoseStack poseStack) {
         float x = CameraShake.offsetX;
         float y = CameraShake.offsetY;
         if (Math.abs(x) < 1e-5f && Math.abs(y) < 1e-5f) return;

@@ -36,18 +36,8 @@ public class LuminescentBubbleBlock extends Block implements SimpleWaterloggedBl
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     private static final VoxelShape SHAPE = box(3.3, 1, 3.3, 12.7, 15, 12.7);
 
-    public LuminescentBubbleBlock() {
-        super(Properties.of()
-                .mapColor(MapColor.WATER)
-                .sound(SoundType.CORAL_BLOCK)
-                .strength(0.1f, 0.5f)
-                .lightLevel(s -> 15)
-                .offsetType(OffsetType.XYZ)
-                .noCollision()
-                .noOcclusion()
-                .postProcess((bs, br, bp) -> bp)
-                .emissiveRendering((bs, br, bp) -> true)
-                .dynamicShape());
+    public LuminescentBubbleBlock(Properties properties) {
+        super(properties);
         this.registerDefaultState(stateDefinition.any().setValue(WATERLOGGED, false));
     }
 

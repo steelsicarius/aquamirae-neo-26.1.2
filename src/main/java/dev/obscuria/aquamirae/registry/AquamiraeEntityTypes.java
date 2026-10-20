@@ -81,6 +81,15 @@ public final class AquamiraeEntityTypes {
     }
 
     static void init() {
+        // MC 26.1.2: registerAttributes cannot be called at construction time:
+        // AttributeSupplier.Builder eagerly creates AttributeInstances that
+        // resolve Holder<Attribute> (attribute.value()), and NeoForge's own
+        // mod-registered attributes (swim_speed, nametag_distance) only bind
+        // once the ATTRIBUTE RegisterEvent has run. Registration is deferred
+        // to that event via NeoAquamirae (see #registerAttributes()).
+    }
+
+    public static void registerAttributes() {
         var registrar = AquamiraeRegistries.REGISTRAR;
 
         registrar.registerAttributes(SCUTTLER, Mob.createMobAttributes());
@@ -94,9 +103,5 @@ public final class AquamiraeEntityTypes {
         registrar.registerAttributes(CAPTAIN_CORNELIA, Monster.createMonsterAttributes());
         registrar.registerAttributes(EEL, Monster.createMonsterAttributes());
         registrar.registerAttributes(TORTURED_SOUL, Monster.createMonsterAttributes());
-
-        // MC 26.1.2 / Fragmentum v4: Registrar#registerSpawnPlacement is gone.
-        // Spawn placements for the entities below must be registered through
-        // NeoForge's RegisterSpawnPlacementsEvent (mod event bus) — see port report.
     }
 }

@@ -43,12 +43,8 @@ public class FrozenChestBlock extends Block implements SimpleWaterloggedBlock {
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     private static final VoxelShape SHAPE = box(0.9, 0, 0.9, 15.1, 14.1, 15.1);
 
-    public FrozenChestBlock() {
-        super(Properties.of()
-                .strength(-1, 3600000)
-                .mapColor(MapColor.WOOD)
-                .sound(SoundType.WOOD)
-                .noOcclusion());
+    public FrozenChestBlock(Properties properties) {
+        super(properties);
         registerDefaultState(stateDefinition.any()
                 .setValue(FACING, Direction.NORTH)
                 .setValue(WATERLOGGED, false));

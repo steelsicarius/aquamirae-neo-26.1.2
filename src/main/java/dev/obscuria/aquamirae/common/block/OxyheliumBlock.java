@@ -45,19 +45,8 @@ public class OxyheliumBlock extends Block implements SimpleWaterloggedBlock {
     public static final EnumProperty<Type> TYPE = EnumProperty.create("type", Type.class);
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
-    public OxyheliumBlock() {
-        super(Properties.of()
-                .mapColor(MapColor.WATER)
-                .sound(SoundType.CORAL_BLOCK)
-                .strength(0.8f, 1f)
-                .randomTicks()
-                .requiresCorrectToolForDrops()
-                .noCollision()
-                .speedFactor(0.8f)
-                .jumpFactor(0.8f)
-                .postProcess((bs, br, bp) -> isGlowing(bs) ? bp : null)
-                .emissiveRendering((bs, br, bp) -> isGlowing(bs))
-                .lightLevel(s -> isGlowing(s) ? 12 : 0));
+    public OxyheliumBlock(Properties properties) {
+        super(properties);
         registerDefaultState(stateDefinition.any()
                 .setValue(WATERLOGGED, false)
                 .setValue(TYPE, Type.STEM));
@@ -192,7 +181,7 @@ if (state.getValue(WATERLOGGED)) ticks.scheduleTick(currentPos, Fluids.WATER, Fl
         return InteractionResult.SUCCESS;
     }
 
-    private static boolean isGlowing(BlockState state) {
+    public static boolean isGlowing(BlockState state) {
         return state.getValue(TYPE) == Type.BUD || state.getValue(TYPE) == Type.RARE_BUD;
     }
 
