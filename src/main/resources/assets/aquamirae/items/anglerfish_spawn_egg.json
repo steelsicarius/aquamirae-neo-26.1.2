@@ -1,0 +1,16 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "aquamirae:item/anglerfish_spawn_egg",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -12963033
+      },
+      {
+        "type": "minecraft:constant",
+        "value": -4942746
+      }
+    ]
+  }
+}
