@@ -56,6 +56,12 @@ Estado verificado:
 - Entrada `"minecraft:air"` con peso (loot de Captain Cornelia) → tipo `"minecraft:empty"`.
 - Keepsakes remotos: `Color.codec()` de Fragmentum v4 acepta objeto/decimal/hex (`#RRGGBB`).
 
+### Items con textura y tooltips (encontrados en pruebas de juego reales)
+- **`assets/aquamirae/items/*.json` (75 definiciones)**: MC 26.x requiere un *item definition* por ítem (desde 1.21.4; en 1.21.1 el enlace a `models/item` era automático). Sin ellas el juego pinta los ítems sin textura ("Missing item model for location aquamirae:…"). Incluye:
+  - 11 spawn eggs con dos `tints` constantes (los colores ya no viven en el ítem, sino en la definición cliente).
+  - `echo_compass`: `range_dispatch` con 33 entradas (umbrales = ángulo×32 → modelos vanilla `recovery_compass*`) usando la propiedad `aquamirae:echo_compass/angle` registrada vía `RegisterRangeSelectItemModelPropertyEvent`.
+- **`MixinRichTextLexer`**: parchea un bug de Fragmentum 4.0.5/4.1.0 que crashea con `IllegalStateException: No match found` cualquier texto con tags (`[color=…][/br]`) — tooltips de abilities, tooltips de ítems y lore de keepsakes. El lexer guarda el `Matcher` vivo en cada span y llama `group()` cuando ya está agotado; en Java 25 `Matcher.toMatchResult()` devuelve un snapshot que no es `Matcher`, así que se usa el matcher ya agotado. El mixin redirige `toMatchResult()` para devolver un matcher "congelado" sobre el match actual (`require = 0` para convivir con una futura versión corregida).
+
 ## Workarounds de entorno (aarch64 / Oracle Linux 9)
 
 - **LWJGL arm64**: el manifiesto vanilla 26.1.2 solo declara `natives-linux` (x64) para Linux. Los 8 jars `natives-linux-arm64` de Maven Central viven en `lib/natives-linux-arm64/` y se añaden al runtime classpath (`runtimeOnly fileTree`); LWJGL elige el arch correcto.
