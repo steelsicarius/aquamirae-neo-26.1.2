@@ -2,7 +2,6 @@ package dev.obscuria.aquamirae.integration.hook;
 
 import dev.obscuria.aquamirae.api.common.TooltipImageProvider;
 import dev.obscuria.aquamirae.registry.AquamiraeDataComponents;
-import dev.obscuria.fragmentum.v2.core.common._TooltipStack;
 import dev.obscuria.fragmentum.v2.api.common.richtext.RichTextOptions;
 import dev.obscuria.fragmentum.v2.api.common.richtext.RichText;
 import net.minecraft.network.chat.CommonComponents;
@@ -46,7 +45,11 @@ public final class HookItemStack {
                 var components = new ArrayList<TooltipComponent>();
                 for (TooltipImageProvider scratch : providersScratch)
                     components.add(scratch.getTooltipImage(stack));
-                yield Optional.of(new _TooltipStack(components));
+                // MC 26.1.2: use our concrete TooltipStack implementation; the
+                // Fragmentum-internal _TooltipStack never matches its own
+                // registry (registered against the interface, matched by exact
+                // class) and crashes with "Unknown TooltipComponent".
+                yield Optional.of(new dev.obscuria.aquamirae.api.common.AquamiraeTooltipStack(components));
             }
         };
     }

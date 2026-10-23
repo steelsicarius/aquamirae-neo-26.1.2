@@ -21,7 +21,9 @@ import dev.obscuria.aquamirae.registry.AquamiraeDataComponents;
 import dev.obscuria.aquamirae.registry.AquamiraeEntityTypes;
 import dev.obscuria.aquamirae.registry.AquamiraeParticleTypes;
 import dev.obscuria.fragmentum.v2.api.client.FragmentumClientRegistry;
+import dev.obscuria.fragmentum.v2.api.client.ClientTooltipStack;
 import dev.obscuria.fragmentum.v2.api.client.TooltipComponentRegistry;
+import dev.obscuria.aquamirae.api.common.AquamiraeTooltipStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.CubeMap;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -84,11 +86,12 @@ public final class AquamiraeClient {
 
     public static void init() {
 
-        // MC 26.1.2 / Fragmentum v4: registers the built-in TooltipStack renderer
-        // (grouped tooltip components). Without it, hovering any item that yields
-        // two or more tooltip components (e.g. Dreadwake: ability set + keepsake)
-        // crashes with "Unknown TooltipComponent".
-        dev.obscuria.fragmentum.client.FragmentumClient.init();
+        // MC 26.1.2 / Fragmentum v4: FragmentumClient.init() registers the built-in
+        // grouped-tooltip renderer against the TooltipStack *interface*, but the
+        // registry matches components by *exact class*, so it never applies.
+        // Register our concrete AquamiraeTooltipStack (grouped tooltip images for
+        // items like Dreadwake: ability set + keepsake) instead — otherwise those
+        // items crash with "Unknown TooltipComponent".
 
         ClientConfig.init();
         var registrar = FragmentumClientRegistry.registrar(Aquamirae.MOD_ID);
@@ -97,6 +100,7 @@ public final class AquamiraeClient {
         TooltipComponentRegistry.register(RuneDamage.class, ClientRuneTooltip::create);
         TooltipComponentRegistry.register(RuneProtection.class, ClientRuneTooltip::create);
         TooltipComponentRegistry.register(Keepsake.class, ClientKeepsakeTooltip::create);
+        TooltipComponentRegistry.register(AquamiraeTooltipStack.class, ClientTooltipStack::create);
 
         registrar.registerModelLayer(AquamiraeModelLayers.ABYSSAL_SCYPHOID, ModelAbyssalScyphoid::createBodyLayer);
         registrar.registerModelLayer(AquamiraeModelLayers.SPINEFISH, ModelSpinefish::createBodyLayer);

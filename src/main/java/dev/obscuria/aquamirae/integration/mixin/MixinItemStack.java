@@ -3,7 +3,6 @@ package dev.obscuria.aquamirae.integration.mixin;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import dev.obscuria.aquamirae.integration.hook.HookItemStack;
 import dev.obscuria.aquamirae.registry.AquamiraeDataComponents;
-import dev.obscuria.fragmentum.v2.core.common._TooltipStack;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
@@ -32,7 +31,12 @@ public abstract class MixinItemStack {
     private Optional<TooltipComponent> getTooltipImage$modifyReturnValue(Optional<TooltipComponent> original) {
         var addition = HookItemStack.getTooltipImage((ItemStack) (Object) this);
         if (addition.isEmpty()) return original;
-        return Optional.of(_TooltipStack.maybeGroup(original.orElse(null), addition.get()));
+        if (original.isEmpty()) return addition;
+        // MC 26.1.2: group with our concrete TooltipStack (the Fragmentum
+        // internal _TooltipStack never matches its own registry, which is keyed
+        // by exact class, and crashes with "Unknown TooltipComponent").
+        return Optional.of(new dev.obscuria.aquamirae.api.common.AquamiraeTooltipStack(
+                java.util.List.of(original.get(), addition.get())));
     }
 
     // MC 26.1.2: the lore tooltip lines moved from getTooltipLines into
