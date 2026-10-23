@@ -25,3 +25,4 @@ repo
 
 # Files from the original 1.21.1 project that are not needed here
 *.bbmodel.bak
+logs/

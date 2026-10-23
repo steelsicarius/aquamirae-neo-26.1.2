@@ -29,7 +29,7 @@ public enum AquamiraeSpawnData {
             CommonConfig.ANGLERFISH_SPAWN_MIN_COUNT,
             CommonConfig.ANGLERFISH_SPAWN_MAX_COUNT),
     SCUTTLER(
-            MobCategory.CREATURE,
+            MobCategory.AMBIENT,
             AquamiraeEntityTypes.SCUTTLER::get,
             CommonConfig.ENABLE_SCUTTLER_SPAWNING,
             CommonConfig.SCUTTLER_SPAWN_WEIGHT,

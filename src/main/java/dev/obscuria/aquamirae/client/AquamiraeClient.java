@@ -84,6 +84,12 @@ public final class AquamiraeClient {
 
     public static void init() {
 
+        // MC 26.1.2 / Fragmentum v4: registers the built-in TooltipStack renderer
+        // (grouped tooltip components). Without it, hovering any item that yields
+        // two or more tooltip components (e.g. Dreadwake: ability set + keepsake)
+        // crashes with "Unknown TooltipComponent".
+        dev.obscuria.fragmentum.client.FragmentumClient.init();
+
         ClientConfig.init();
         var registrar = FragmentumClientRegistry.registrar(Aquamirae.MOD_ID);
 
