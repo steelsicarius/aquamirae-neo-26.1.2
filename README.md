@@ -62,6 +62,12 @@ Estado verificado:
   - `echo_compass`: `range_dispatch` con 33 entradas (umbrales = ángulo×32 → modelos vanilla `recovery_compass*`) usando la propiedad `aquamirae:echo_compass/angle` registrada vía `RegisterRangeSelectItemModelPropertyEvent`.
 - **`MixinRichTextLexer`**: parchea un bug de Fragmentum 4.0.5/4.1.0 que crashea con `IllegalStateException: No match found` cualquier texto con tags (`[color=…][/br]`) — tooltips de abilities, tooltips de ítems y lore de keepsakes. El lexer guarda el `Matcher` vivo en cada span y llama `group()` cuando ya está agotado; en Java 25 `Matcher.toMatchResult()` devuelve un snapshot que no es `Matcher`, así que se usa el matcher ya agotado. El mixin redirige `toMatchResult()` para devolver un matcher "congelado" sobre el match actual (`require = 0` para convivir con una futura versión corregida).
 
+### Encontrado en la segunda ronda de pruebas de juego
+- **GeckoLib 5.5.2 usa `assets/<ns>/geckolib/models|animations/`** en 26.x (no `geo/`): migrados los 13 modelos de armadura, 3 de entidad y 3 animaciones. Sin esto las armaduras equipadas no se renderizan y `Loaded 0 models`.
+- **Huevos de spawn**: `minecraft:item/template_spawn_egg` ya no existe en 26.x. El mod ahora incluye `textures/item/spawn_egg(_overlay).png` (extraídas del client.jar 1.21.1) + un `models/item/template_spawn_egg.json` propio; los 11 huevos heredan de él y los `items/*.json` tiñen las dos capas con tints constantes (sustituto del color por item eliminado).
+- **`FragmentumClient.init()`** registra el renderer del grupo `TooltipStack` de Fragmentum v4; sin llamarlo, cualquier ítem con 2+ componentes de tooltip (p. ej. Dreadwake: ability set + keepsake) crashea con `Unknown TooltipComponent`. Se invoca desde `AquamiraeClient.init()`.
+- `AquamiraeSpawnData.SCUTTLER` pasa a `AMBIENT` para coincidir con el EntityType (corrige el warning de NeoForge sobre mob caps).
+
 ## Workarounds de entorno (aarch64 / Oracle Linux 9)
 
 - **LWJGL arm64**: el manifiesto vanilla 26.1.2 solo declara `natives-linux` (x64) para Linux. Los 8 jars `natives-linux-arm64` de Maven Central viven en `lib/natives-linux-arm64/` y se añaden al runtime classpath (`runtimeOnly fileTree`); LWJGL elige el arch correcto.
