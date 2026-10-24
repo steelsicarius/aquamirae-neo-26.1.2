@@ -75,6 +75,12 @@ Estado verificado:
 - **IPv6 deshabilitado** en el host: `run/server.properties` usa `server-ip=0.0.0.0`; el run `server` pasa `--port 25599`.
 - En cliente headless (Xvfb) no hay narrador (`flite`) ni dispositivo de audio; MC los degrada sin crash.
 
+### Tercera ronda de pruebas de juego
+- **Shipbreaker invisible**: el render se enganchaba con un mixin frágil sobre `LevelRenderer.renderLevel`; ahora usa `RenderLevelStageEvent.AfterWeather` (API pública de NeoForge), que dibuja dentro del pass activo del frame graph. El spawner, los temblores, la física y los payloads ya funcionaban.
+- **Echo compass**: `minecraft:item/recovery_compass` (frame base) no existe en 26.x; los umbrales 0.0/31.5 apuntan a `recovery_compass_16` (equivalente vanilla).
+- **Traducciones**: en 26.x todos los ítems (incl. BlockItems) usan `item.<ns>.<id>` como description id (antes los BlockItems pedían `block.*`); añadidas las claves que faltan en los 18 idiomas.
+- **Aclaraciones de fidelidad** (verificado contra el origen 1.21.1, no son bugs del port): `niveis_tear` es un asset huérfano (lang/modelo/textura, nunca registrado ni usado); el Shipbreaker se invoca con el *cracked record* en un jukebox dentro del bioma ice maze, o por el spawner aleatorio del bioma; **no existe** ninguna dimensión "ice maze" en el original (ni `data/…/dimension`, ni envío de `ClientboundTravelPayload`), y los custom spawners solo se registran en el OVERWORLD.
+
 ## Limitaciones conocidas / pendiente
 
 - Ambient particles/fog/sky/water-fog de biomas: en 26.x son *environment attributes* datapack-driven que los biome modifiers de NeoForge no pueden parchear — temporalmente no-op en `NeoBiomePatcher` (habría que hacerlo con un datapack override del biome).
