@@ -6,22 +6,6 @@ Port del mod **Aquamirae** (Obscuria, NeoForge/MC 1.21.1) a **NeoForge 26.1.2.11
 - Destino: este directorio (MDK ModDevGradle 26.1.2, plugin `net.neoforged.moddev` 2.0.148)
 - Dependencias: GeckoLib 5.5.2, Fragmentum 26.1-4.0.5, YACL 3.9.7+26.1-neoforge, MixinExtras 0.5.5, Lombok
 
-## Compilar y ejecutar
-
-```bash
-JAVA_HOME=/usr/java/jdk-25-oracle-aarch64 ./gradlew build
-JAVA_HOME=/usr/java/jdk-25-oracle-aarch64 ./gradlew runServer   # puerto 25599 (25565 ocupado)
-xvfb-run -a env JAVA_HOME=/usr/java/jdk-25-oracle-aarch64 ./gradlew runClient --no-configuration-cache
-```
-
-Estado verificado:
-
-| Prueba | Resultado |
-|---|---|
-| `gradlew build` | OK |
-| `runServer` (puerto 25599) | Arranca limpio: `Done (0.3s)`, sin ERROR/WARN de datos |
-| `runClient` (Xvfb, aarch64) | Carga mods, registros, texturas/atlasses y renderiza el menú estable (>3 min); sin fallos de mixins |
-
 ## Cambios del port (1.21.1 → 26.1.2)
 
 ### Registro / carga del mod
