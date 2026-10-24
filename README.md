@@ -1,4 +1,4 @@
-# Aquamirae — port a NeoForge / Minecraft 26.1.2
+# Aquamirae — Unoficial Port a NeoForge / Minecraft 26.1.2
 
 Port del mod **Aquamirae** (Obscuria, NeoForge/MC 1.21.1) a **NeoForge 26.1.2.114**.
 
