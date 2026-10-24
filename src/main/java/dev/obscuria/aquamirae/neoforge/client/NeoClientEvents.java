@@ -5,12 +5,14 @@ import dev.obscuria.aquamirae.client.AquamiraeClient;
 import dev.obscuria.aquamirae.client.EchoCompassAngle;
 import dev.obscuria.aquamirae.client.FogEvents;
 import dev.obscuria.aquamirae.client.FogSmoother;
+import dev.obscuria.aquamirae.client.event.ShipbreakerClientState;
 import dev.obscuria.aquamirae.config.ClientConfig;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.RegisterRangeSelectItemModelPropertyEvent;
+import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
 import org.jetbrains.annotations.Nullable;
 
@@ -86,6 +88,28 @@ public final class NeoClientEvents {
             return environment == null
                     ? FogEvents.FogMode.FOG_SKY
                     : FogEvents.FogMode.FOG_TERRAIN;
+        }
+
+        /**
+         * MC 26.1.2: the Shipbreaker (giant world event) was rendered through a
+         * LevelRenderer mixin at the old bufferSource call site, which is fragile
+         * under the frame graph renderer. RenderLevelStageEvent.AfterWeather is
+         * the official hook and renders inside the active render pass.
+         */
+        @SubscribeEvent
+        public static void onRenderLevelAfterWeather(RenderLevelStageEvent.AfterWeather event) {
+            var minecraft = Minecraft.getInstance();
+            ClientLevel level = minecraft.level;
+            if (level == null) return;
+
+            var camera = minecraft.gameRenderer.getMainCamera();
+            var frustum = event.getLevelRenderState().cameraRenderState.cullFrustum;
+            var source = minecraft.renderBuffers().bufferSource();
+
+            ShipbreakerClientState.render(
+                    event.getPoseStack(), level, frustum, camera,
+                    source, AquamiraeClient.partialTicks());
+            source.endBatch();
         }
     }
 

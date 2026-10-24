@@ -8,7 +8,7 @@
         "threshold": 0.0,
         "model": {
           "type": "minecraft:model",
-          "model": "minecraft:item/recovery_compass"
+          "model": "minecraft:item/recovery_compass_16"
         }
       },
       {
@@ -232,7 +232,7 @@
         "threshold": 31.5,
         "model": {
           "type": "minecraft:model",
-          "model": "minecraft:item/recovery_compass"
+          "model": "minecraft:item/recovery_compass_16"
         }
       }
     ]

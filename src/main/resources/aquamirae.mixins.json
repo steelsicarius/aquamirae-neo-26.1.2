@@ -28,7 +28,6 @@
     "client.MixinGuiRenderer",
     "client.MixinItemModelResolver",
     "client.MixinItemStackRenderState",
-    "client.MixinLevelRenderer",
     "client.MixinLogoRenderer",
     "client.MixinMinecraft",
     "client.MixinPillagerRenderer",
