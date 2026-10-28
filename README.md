@@ -81,8 +81,10 @@ Estado verificado:
 - **Traducciones**: en 26.x todos los ítems (incl. BlockItems) usan `item.<ns>.<id>` como description id (antes los BlockItems pedían `block.*`); añadidas las claves que faltan en los 18 idiomas.
 - **Aclaraciones de fidelidad** (verificado contra el origen 1.21.1, no son bugs del port): `niveis_tear` es un asset huérfano (lang/modelo/textura, nunca registrado ni usado); el Shipbreaker se invoca con el *cracked record* en un jukebox dentro del bioma ice maze, o por el spawner aleatorio del bioma; **no existe** ninguna dimensión "ice maze" en el original (ni `data/…/dimension`, ni envío de `ClientboundTravelPayload`), y los custom spawners solo se registran en el OVERWORLD.
 
-## Limitaciones conocidas / pendiente
+### Corrección final: sonido del Shell Horn
+- El item `shell_horn` usaba botón derecho y reproducía `AquamiraeSounds.ITEM_SHELL_HORN_USE`, registrado como `stack.shell_horn.use`, mientras que `assets/aquamirae/sounds.json` definía `item.shell_horn.use`. Corregido el registro a `item.` (junto con los otros `stack.` → `item.` de items relacionados) para que coincida con el archivo de sonidos.
 
+## Limitaciones conocidas / pendiente
 - Ambient particles/fog/sky/water-fog de biomas: en 26.x son *environment attributes* datapack-driven que los biome modifiers de NeoForge no pueden parchear — temporalmente no-op en `NeoBiomePatcher` (habría que hacerlo con un datapack override del biome).
 - La textura del panorama temático se registra junto al panorama vanilla; el menú temático requiere `themed_main_menu` activo en la config de cliente.
 - Queda por validar en juego (no solo smoke test): interacciones, spawns en el ice maze, abilidades, GUIs (config screen YACL) — el servidor/cliente arrancan y registran todo, pero no hay tests funcionales automáticos.
