@@ -14,9 +14,9 @@ public final class AquamiraeSounds {
     public static final SoundEvent EVENT_GLACIER_CRACK = register("event.glacier_crack");
     public static final SoundEvent EVENT_AIR_SUPPLY = register("event.air_supply");
 
-    public static final SoundEvent ITEM_PIRATE_POUCH_OPEN = register("stack.pirate_pouch.open");
-    public static final SoundEvent ITEM_TREASURE_POUCH_OPEN = register("stack.treasure_pouch.open");
-    public static final SoundEvent ITEM_SHELL_HORN_USE = register("stack.shell_horn.use");
+    public static final SoundEvent ITEM_PIRATE_POUCH_OPEN = register("item.pirate_pouch.open");
+    public static final SoundEvent ITEM_TREASURE_POUCH_OPEN = register("item.treasure_pouch.open");
+    public static final SoundEvent ITEM_SHELL_HORN_USE = register("item.shell_horn.use");
 
     public static final SoundEvent BLOCK_FROZEN_CHEST_UNLOCK = register("block.frozen_chest.unlock");
 
